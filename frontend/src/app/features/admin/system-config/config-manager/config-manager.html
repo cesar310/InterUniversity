@@ -1,0 +1,137 @@
+<app-page-header
+  [title]="'Configuración del Sistema'"
+  [buttons]="headerButtons"
+/>
+
+<p-card>
+  <p-table
+    [value]="configs()"
+    [loading]="loading()"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} configuraciones"
+    [rowsPerPageOptions]="[5, 10, 25]"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Clave</th>
+        <th>Valor</th>
+        <th>Tipo</th>
+        <th>Descripción</th>
+        <th>Última Actualización</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-config>
+      <tr>
+        <td>
+          <span class="font-semibold">{{ config.configKey }}</span>
+        </td>
+        <td>
+          @if (isEditing(config.id)) {
+            @switch (config.valueType) {
+              @case (0) {
+                <p-inputnumber
+                  [(ngModel)]="editingValue"
+                  [showButtons]="true"
+                  [min]="1"
+                  class="w-full"
+                />
+              }
+              @case (3) {
+                <p-inputnumber
+                  [(ngModel)]="editingValue"
+                  [showButtons]="true"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                  [min]="0"
+                  class="w-full"
+                />
+              }
+              @case (2) {
+                <div class="flex items-center gap-2">
+                  <p-toggleSwitch
+                    [(ngModel)]="editingBoolValue"
+                  />
+                  <span class="text-sm text-gray-600">
+                    {{ editingBoolValue() ? 'Verdadero' : 'Falso' }}
+                  </span>
+                </div>
+              }
+              @default {
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="editingValue"
+                  class="w-full"
+                />
+              }
+            }
+          } @else {
+            <span class="font-mono text-blue-600">{{ config.configValue }}</span>
+          }
+        </td>
+        <td>
+          <p-tag
+            [severity]="getTypeSeverity(config.valueType)"
+            [value]="getTypeName(config.valueType)"
+          />
+        </td>
+        <td>
+          <span class="text-sm text-gray-600">{{ config.description }}</span>
+        </td>
+        <td>
+          <span class="text-xs text-gray-500">{{ formatDate(config.updatedAt) }}</span>
+        </td>
+        <td>
+          <div class="flex gap-2">
+            @if (isEditing(config.id)) {
+              <p-button
+                icon="pi pi-check"
+                severity="success"
+                [text]="true"
+                [rounded]="true"
+                pTooltip="Guardar"
+                tooltipPosition="top"
+                (onClick)="saveEdit(config)"
+              />
+              <p-button
+                icon="pi pi-times"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                pTooltip="Cancelar"
+                tooltipPosition="top"
+                (onClick)="cancelEdit()"
+              />
+            } @else {
+              <p-button
+                icon="pi pi-pencil"
+                severity="secondary"
+                [text]="true"
+                [rounded]="true"
+                pTooltip="Editar"
+                tooltipPosition="top"
+                (onClick)="startEdit(config)"
+              />
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center">
+          <div class="py-4">
+            <i class="pi pi-inbox text-4xl text-gray-400 mb-2"></i>
+            <p class="text-gray-500">No hay configuraciones disponibles</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<p-confirmDialog />

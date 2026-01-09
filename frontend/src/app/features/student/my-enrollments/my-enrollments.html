@@ -1,0 +1,179 @@
+<app-page-header [title]="'Mis Inscripciones'" />
+
+<!-- Contador de inscripciones -->
+<div class="mb-4">
+  <p-card>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Resumen de Inscripciones</h3>
+        <p class="text-sm text-gray-600 mt-1">
+          Materias inscritas: <span class="font-bold text-blue-600">{{ activeEnrollmentsCount() }}</span> / <span class="font-bold">{{ maxAllowed() }}</span>
+        </p>
+      </div>
+      <div class="text-left sm:text-right">
+        <p class="text-sm text-gray-600">Total de créditos</p>
+        <p class="text-2xl font-bold text-blue-900">{{ totalCredits() }}</p>
+      </div>
+    </div>
+  </p-card>
+</div>
+
+<!-- Tabla de inscripciones -->
+<p-card>
+  <!-- Vista de tabla para desktop -->
+  <div class="hidden md:block">
+    <p-table
+      [value]="myEnrollments()"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} materias"
+      [rowsPerPageOptions]="[5, 10, 25]"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Materia</th>
+          <th>Profesor</th>
+          <th>Créditos</th>
+          <th>Fecha de Inscripción</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-enrollment>
+        <tr>
+          <td>
+            <div class="font-medium text-gray-900">{{ enrollment.subjectName }}</div>
+          </td>
+          <td>{{ enrollment.professorName }}</td>
+          <td>
+            <span class="font-semibold text-blue-600">{{ enrollment.credits }}</span>
+          </td>
+          <td>{{ formatDate(enrollment.enrolledAt) }}</td>
+          <td>
+            <div class="flex gap-2">
+              <p-button
+                icon="pi pi-users"
+                severity="info"
+                [text]="true"
+                [rounded]="true"
+                pTooltip="Ver compañeros"
+                tooltipPosition="top"
+                (onClick)="viewClassmates(enrollment.subjectId, enrollment.subjectName)"
+              />
+              <p-button
+                icon="pi pi-times"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                pTooltip="Cancelar inscripción"
+                tooltipPosition="top"
+                (onClick)="cancelEnrollment(enrollment.subjectId, enrollment.subjectName)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center py-8">
+            <div class="flex flex-col items-center gap-3">
+              <i class="pi pi-inbox text-4xl text-gray-400"></i>
+              <p class="text-gray-600">No tienes inscripciones activas</p>
+              <p class="text-sm text-gray-500">Explora las materias disponibles para inscribirte</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Vista de cards para móvil -->
+  <div class="block md:hidden">
+    @if (loading()) {
+      <div class="flex justify-center items-center py-8">
+        <i class="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
+      </div>
+    } @else if (myEnrollments().length === 0) {
+      <div class="flex flex-col items-center gap-3 py-8">
+        <i class="pi pi-inbox text-4xl text-gray-400"></i>
+        <p class="text-gray-600">No tienes inscripciones activas</p>
+        <p class="text-sm text-gray-500 text-center px-4">Explora las materias disponibles para inscribirte</p>
+      </div>
+    } @else {
+      <div class="flex flex-col gap-3">
+        @for (enrollment of myEnrollments(); track enrollment.subjectId) {
+          <div class="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-3">
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-900 mb-1">{{ enrollment.subjectName }}</h4>
+                <p class="text-sm text-gray-600">{{ enrollment.professorName }}</p>
+              </div>
+              <span class="text-lg font-bold text-blue-600 ml-2">{{ enrollment.credits }}</span>
+            </div>
+            
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+              <i class="pi pi-calendar text-xs"></i>
+              <span>{{ formatDate(enrollment.enrolledAt) }}</span>
+            </div>
+            
+            <div class="flex gap-2 pt-3 border-t border-gray-100">
+              <p-button
+                label="Compañeros"
+                icon="pi pi-users"
+                severity="info"
+                [outlined]="true"
+                size="small"
+                styleClass="flex-1"
+                (onClick)="viewClassmates(enrollment.subjectId, enrollment.subjectName)"
+              />
+              <p-button
+                label="Cancelar"
+                icon="pi pi-times"
+                severity="danger"
+                [outlined]="true"
+                size="small"
+                styleClass="flex-1"
+                (onClick)="cancelEnrollment(enrollment.subjectId, enrollment.subjectName)"
+              />
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</p-card>
+
+<!-- Dialog para ver compañeros -->
+<p-dialog
+  [(visible)]="showClassmatesDialog"
+  [header]="'Compañeros en ' + selectedSubjectName()"
+  [modal]="true"
+  [style]="{width: '50vw'}"
+  [breakpoints]="{'960px': '75vw', '640px': '95vw'}"
+>
+  @if (loadingClassmates()) {
+    <div class="flex justify-center items-center py-8">
+      <i class="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
+    </div>
+  } @else {
+    @if (classmates().length > 0) {
+      <div class="space-y-2">
+        @for (classmate of classmates(); track classmate.studentName) {
+          <div class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+            <i class="pi pi-user text-blue-500"></i>
+            <span class="font-medium text-gray-900">{{ classmate.studentName }}</span>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-center py-8">
+        <i class="pi pi-users text-4xl text-gray-400"></i>
+        <p class="text-gray-600 mt-2">No hay otros estudiantes inscritos en esta materia</p>
+      </div>
+    }
+  }
+</p-dialog>
+
+<p-confirmDialog />

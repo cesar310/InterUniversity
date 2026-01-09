@@ -1,0 +1,291 @@
+### Student Enrollment API - Test Collection
+### Base URL
+@baseUrl = https://localhost:5001/api/v1
+@adminToken = {{login-admin.response.body.data.token}}
+@studentToken = {{login-student.response.body.data.token}}
+
+###############################################################################
+### 1. AUTHENTICATION ENDPOINTS
+###############################################################################
+
+### 1.1 Login como Administrador (debe existir en DB)
+# @name login-admin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@estudiante.edu",
+  "password": "Admin123!"
+}
+
+### 1.2 Login como Estudiante (crear primero con registro)
+# @name login-student
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "EST001@estudiante.edu",
+  "password": "TempPassword123!"
+}
+
+### 1.3 Registrar Nuevo Estudiante (requiere autenticación admin)
+POST {{baseUrl}}/auth/register
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "email": "juan.perez@estudiante.edu",
+  "fullName": "Juan Pérez"
+}
+
+### 1.4 Cambiar Contraseña (requiere autenticación)
+POST {{baseUrl}}/auth/change-password
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "TempPassword123!",
+  "newPassword": "NewSecure123!",
+  "confirmPassword": "NewSecure123!"
+}
+
+### 1.5 Test Rate Limiting - Login (5 intentos en 15min)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "wrong@estudiante.edu",
+  "password": "WrongPassword"
+}
+
+###############################################################################
+### 2. STUDENTS ENDPOINTS
+###############################################################################
+
+### 2.1 Obtener Todos los Estudiantes (admin only)
+GET {{baseUrl}}/students?page=1&pageSize=10
+Authorization: Bearer {{adminToken}}
+
+### 2.2 Obtener Estudiante por ID (admin only)
+GET {{baseUrl}}/students/1
+Authorization: Bearer {{adminToken}}
+
+### 2.3 Obtener Mi Perfil (student)
+GET {{baseUrl}}/students/me
+Authorization: Bearer {{studentToken}}
+
+### 2.4 Actualizar Estudiante (admin only)
+PATCH {{baseUrl}}/students/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "email": "updated.student@estudiante.edu"
+}
+
+### 2.5 Desactivar Estudiante (admin only)
+DELETE {{baseUrl}}/students/1
+Authorization: Bearer {{adminToken}}
+
+###############################################################################
+### 3. PROFESSORS ENDPOINTS
+###############################################################################
+
+### 3.1 Obtener Todos los Profesores (admin only)
+GET {{baseUrl}}/professors?page=1&pageSize=10&isActive=true
+Authorization: Bearer {{adminToken}}
+
+### 3.2 Obtener Profesor por ID (admin only)
+GET {{baseUrl}}/professors/1
+Authorization: Bearer {{adminToken}}
+
+### 3.3 Crear Nuevo Profesor (admin only)
+POST {{baseUrl}}/professors
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Dr. María González",
+  "specialization": "Matemáticas Aplicadas",
+  "email": "maria.gonzalez@universidad.edu",
+  "phone": "+57 300 123 4567"
+}
+
+### 3.4 Actualizar Profesor (admin only)
+PATCH {{baseUrl}}/professors/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "professorId": 1,
+  "name": "Dr. María González Actualizada",
+  "specialization": "Matemáticas y Física",
+  "email": "m.gonzalez@universidad.edu",
+  "phone": "+57 300 999 8888"
+}
+
+### 3.5 Desactivar Profesor (admin only - debe NO tener materias activas)
+DELETE {{baseUrl}}/professors/1
+Authorization: Bearer {{adminToken}}
+
+###############################################################################
+### 4. SUBJECTS ENDPOINTS
+###############################################################################
+
+### 4.1 Obtener Todas las Materias
+GET {{baseUrl}}/subjects?page=1&pageSize=10&isActive=true
+Authorization: Bearer {{adminToken}}
+
+### 4.2 Obtener Materia por ID
+GET {{baseUrl}}/subjects/1
+Authorization: Bearer {{studentToken}}
+
+### 4.3 Crear Nueva Materia (admin only)
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Cálculo I",
+  "credits": 4,
+  "professorId": 1
+}
+
+### 4.4 Actualizar Materia (admin only)
+PATCH {{baseUrl}}/subjects/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "subjectId": 1,
+  "name": "Cálculo I - Actualizado",
+  "credits": 5,
+  "professorId": 1
+}
+
+### 4.5 Desactivar Materia (admin only - debe NO tener inscripciones activas)
+DELETE {{baseUrl}}/subjects/1
+Authorization: Bearer {{adminToken}}
+
+###############################################################################
+### 5. ENROLLMENTS ENDPOINTS
+###############################################################################
+
+### 5.1 Inscribirse en Materia (student)
+POST {{baseUrl}}/enrollments
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "subjectId": 1
+}
+
+### 5.2 Obtener Mis Inscripciones (student)
+GET {{baseUrl}}/enrollments/me?status=Active
+Authorization: Bearer {{studentToken}}
+
+### 5.3 Obtener Todas las Inscripciones (admin only)
+GET {{baseUrl}}/enrollments?page=1&pageSize=10&studentId=1
+Authorization: Bearer {{adminToken}}
+
+### 5.4 Cancelar Inscripción (student/admin)
+DELETE {{baseUrl}}/enrollments/1/1
+Authorization: Bearer {{studentToken}}
+
+###############################################################################
+### 6. SYSTEM CONFIG ENDPOINTS
+###############################################################################
+
+### 6.1 Obtener Todas las Configuraciones (admin only)
+GET {{baseUrl}}/config
+Authorization: Bearer {{adminToken}}
+
+### 6.2 Obtener Configuración por Clave (admin only)
+GET {{baseUrl}}/config/max_enrollments_per_student
+Authorization: Bearer {{adminToken}}
+
+### 6.3 Actualizar Configuración (admin only)
+PATCH {{baseUrl}}/config/max_enrollments_per_student
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "value": "7"
+}
+
+###############################################################################
+### 7. VALIDACIONES DE NEGOCIO - TEST CASES
+###############################################################################
+
+### 7.1 Test: Estudiante intenta inscribirse en materia duplicada (debe fallar)
+POST {{baseUrl}}/enrollments
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "subjectId": 1
+}
+
+### 7.2 Test: Estudiante intenta inscribirse con profesor duplicado (debe fallar)
+POST {{baseUrl}}/enrollments
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "subjectId": 2
+}
+
+### 7.3 Test: Crear materia con nombre duplicado (debe fallar)
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Cálculo I",
+  "credits": 4,
+  "professorId": 1
+}
+
+### 7.4 Test: Profesor excede límite de materias (debe fallar)
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Nueva Materia",
+  "credits": 3,
+  "professorId": 1
+}
+
+### 7.5 Test: Desactivar materia con inscripciones activas (debe fallar)
+DELETE {{baseUrl}}/subjects/1
+Authorization: Bearer {{adminToken}}
+
+###############################################################################
+### 8. AUTHORIZATION TESTS
+###############################################################################
+
+### 8.1 Test: Estudiante intenta acceder a endpoint de admin (debe fallar 403)
+GET {{baseUrl}}/students
+Authorization: Bearer {{studentToken}}
+
+### 8.2 Test: Usuario sin token intenta acceder (debe fallar 401)
+GET {{baseUrl}}/students/me
+
+### 8.3 Test: Estudiante intenta cancelar inscripción de otro (debe fallar 403)
+DELETE {{baseUrl}}/enrollments/99/1
+Authorization: Bearer {{studentToken}}
+
+###############################################################################
+### 9. SWAGGER/OPENAPI
+###############################################################################
+
+### 9.1 Acceder a Swagger UI
+# GET https://localhost:5001/swagger/index.html
+
+### 9.2 Obtener OpenAPI JSON
+# GET https://localhost:5001/swagger/v1/swagger.json

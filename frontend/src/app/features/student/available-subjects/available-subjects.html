@@ -1,0 +1,210 @@
+<app-page-header [title]="'Materias Disponibles'" />
+
+<!-- Barra de búsqueda -->
+<div class="mb-6">
+  <p-card>
+    <div class="flex flex-col gap-4 items-start">
+      <div class="flex-1 w-full">
+        <p-iconfield iconPosition="left" class="w-full">
+          <p-inputicon styleClass="pi pi-search" />
+          <input pInputText type="text" placeholder="Buscar materia, profesor o especialización..."
+            [value]="searchTermValue()" (input)="onSearch($event)" class="w-full text-sm md:text-base" />
+        </p-iconfield>
+      </div>
+      <div class="text-sm text-gray-600 w-full flex items-center justify-between md:justify-start gap-2">
+        <div class="flex items-center gap-2">
+          <i class="pi pi-info-circle"></i>
+          <span>{{ filteredAcademicOffer().length }} materias disponibles</span>
+        </div>
+      </div>
+    </div>
+  </p-card>
+</div>
+
+<!-- DataView de materias -->
+<p-card>
+  <p-dataView [value]="filteredAcademicOffer()" [loading]="loading()" [paginator]="true" [rows]="12"
+    [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} materias"
+    [rowsPerPageOptions]="[6, 12, 24]">
+    <ng-template #list let-items>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        @for (subject of items; track subject.subjectId) {
+        <p-card [styleClass]="'h-full hover:shadow-lg transition-shadow duration-200 cursor-pointer'" (click)="openSubjectDetail(subject)">
+          <ng-template pTemplate="header">
+            <div class="h-2 bg-blue-500 rounded-t-lg"></div>
+          </ng-template>
+
+          <div class="flex flex-col h-full gap-3">
+            <!-- Header Section - Simplificado -->
+            <div class="flex justify-between items-start">
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-gray-800 mb-1 truncate" [pTooltip]="subject.subject" tooltipPosition="top">{{ subject.subject }}</h3>
+                <div class="flex items-center gap-2 text-gray-600">
+                  <i class="pi pi-user text-sm"></i>
+                  <span class="text-sm font-medium truncate">{{ subject.professor }}</span>
+                </div>
+              </div>
+              <div class="flex flex-col items-end ml-2">
+                <span class="text-xl font-bold text-blue-600">{{ subject.credits }}</span>
+                <span class="text-xs text-gray-500">Créd.</span>
+              </div>
+            </div>
+
+            <!-- Info compacta -->
+            <div class="flex items-center justify-between text-sm text-gray-600">
+              <div class="flex items-center gap-1">
+                <i class="pi pi-users text-blue-500 text-xs"></i>
+                <span>{{ subject.enrolledStudents }} inscritos</span>
+              </div>
+              <p-tag [value]="subject.available ? 'Disponible' : 'No disponible'"
+                [severity]="subject.available ? 'success' : 'danger'" styleClass="text-xs"></p-tag>
+            </div>
+
+            <!-- Action Footer -->
+            <div class="mt-auto pt-2">
+              <p-button [label]="'Inscribirse'" [icon]="'pi pi-plus'" [severity]="getEnrollButtonSeverity(subject)"
+                [disabled]="getEnrollButtonDisabled(subject)" [loading]="isSubjectEnrolling(subject.subjectId)"
+                [pTooltip]="getEnrollButtonTooltip(subject)" tooltipPosition="top" (onClick)="enrollInSubject(subject); $event.stopPropagation()"
+                styleClass="w-full" [outlined]="true" size="small" />
+            </div>
+          </div>
+        </p-card>
+        }
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <div class="col-12 text-center py-8">
+        <div class="flex flex-col items-center gap-4">
+          <i class="pi pi-search text-6xl text-gray-300"></i>
+          <div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No se encontraron materias</h3>
+            <p class="text-gray-600">Intenta ajustar tu búsqueda o verifica que haya materias disponibles.</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="loading">
+      <div class="col-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          @for (item of [1,2,3,4,5,6,7,8]; track item) {
+          <div class="card border border-gray-200 animate-pulse">
+            <div class="card-header p-4">
+              <div class="h-4 bg-gray-200 rounded mb-2"></div>
+              <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+            </div>
+            <div class="card-body p-4">
+              <div class="h-3 bg-gray-200 rounded mb-2"></div>
+              <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+            </div>
+            <div class="card-footer p-4">
+              <div class="h-8 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </ng-template>
+  </p-dataView>
+</p-card>
+
+<!-- Dialog de confirmación personalizado -->
+<p-dialog [header]="'Confirmar Inscripción'" [visible]="showConfirmDialog()" (visibleChange)="showConfirmDialog.set($event)" (onHide)="cancelEnrollment()" [modal]="true" [closable]="!enrollingSubjectId()"
+  [closeOnEscape]="!enrollingSubjectId()" [dismissableMask]="false" [draggable]="false" [resizable]="false"
+  styleClass="w-full max-w-md">
+  @if (selectedSubject()) {
+  <div class="flex flex-col gap-4">
+    <div class="flex items-start gap-3">
+      <i class="pi pi-check-circle text-green-500 text-3xl"></i>
+      <div class="flex-1">
+        <p class="text-gray-800 mb-2">
+          ¿Estás seguro de que deseas inscribirte en <strong>{{ selectedSubject()!.subject }}</strong>?
+        </p>
+        <div class="text-sm text-gray-600">
+          <p><strong>Profesor:</strong> {{ selectedSubject()!.professor }}</p>
+          <p><strong>Créditos:</strong> {{ selectedSubject()!.credits }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="flex gap-2 justify-end">
+      <p-button label="Cancelar" [outlined]="true" severity="secondary" (onClick)="cancelEnrollment()"
+        [disabled]="enrollingSubjectId() !== null" />
+      <p-button label="Sí, inscribirme" severity="success" (onClick)="confirmEnrollment()"
+        [loading]="enrollingSubjectId() !== null" [disabled]="!selectedSubject() || enrollingSubjectId() !== null" />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog de detalle de materia -->
+<p-dialog [header]="selectedSubject()?.subject ?? 'Detalle de Materia'" [visible]="showDetailDialog()" (visibleChange)="showDetailDialog.set($event)" [modal]="true"
+  [dismissableMask]="true" [draggable]="false" [resizable]="false" styleClass="w-full max-w-2xl">
+  @if (selectedSubject(); as subject) {
+  <div class="flex flex-col gap-6">
+    <!-- Header con profesor y créditos -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+          <i class="pi pi-user text-blue-600 text-xl"></i>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-800">{{ subject.professor }}</p>
+          @if (subject.specialization) {
+          <p class="text-sm text-gray-500">{{ subject.specialization }}</p>
+          }
+          @if (subject.professorEmail) {
+          <a [href]="'mailto:' + subject.professorEmail" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
+            <i class="pi pi-envelope text-xs"></i>
+            {{ subject.professorEmail }}
+          </a>
+          }
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="text-center px-4 py-2 bg-blue-50 rounded-lg">
+          <span class="text-2xl font-bold text-blue-600">{{ subject.credits }}</span>
+          <p class="text-xs text-gray-500">Créditos</p>
+        </div>
+        <div class="text-center px-4 py-2 bg-gray-50 rounded-lg">
+          <span class="text-2xl font-bold text-gray-700">{{ subject.enrolledStudents }}</span>
+          <p class="text-xs text-gray-500">Inscritos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div>
+      <h4 class="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+        <i class="pi pi-book text-blue-500"></i>
+        Descripción del curso
+      </h4>
+      @if (subject.description) {
+      <p class="text-gray-600 leading-relaxed whitespace-pre-line">{{ subject.description }}</p>
+      } @else {
+      <p class="text-gray-400 italic">No hay descripción disponible para esta materia.</p>
+      }
+    </div>
+
+    <!-- Estado -->
+    <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+      <div class="flex items-center gap-2">
+        <span class="text-gray-600">Estado:</span>
+        <p-tag [value]="subject.available ? 'Disponible para inscripción' : 'No disponible'"
+          [severity]="subject.available ? 'success' : 'danger'" [icon]="subject.available ? 'pi pi-check-circle' : 'pi pi-times-circle'"></p-tag>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex gap-2 justify-end">
+      <p-button label="Cerrar" [outlined]="true" severity="secondary" (onClick)="closeDetailDialog()" />
+      <p-button label="Inscribirse" icon="pi pi-plus" severity="success" (onClick)="enrollFromDetail()"
+        [disabled]="getEnrollButtonDisabled(subject)" [pTooltip]="getEnrollButtonTooltip(subject)" tooltipPosition="top" />
+    </div>
+  </ng-template>
+  }
+</p-dialog>

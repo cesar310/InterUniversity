@@ -1,0 +1,120 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Navbar Superior -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
+    <div class="flex items-center justify-between h-16 px-4">
+      <!-- Logo, Botón Hamburguesa y Título -->
+      <div class="flex items-center gap-3">
+        <!-- Botón Hamburguesa (solo móvil) -->
+        <p-button
+          [text]="true"
+          [rounded]="true"
+          icon="pi pi-bars"
+          (onClick)="toggleMobileMenu()"
+          [ariaLabel]="'Menú'"
+          styleClass="lg:hidden"
+        />
+        
+        <img src="/interu.webp" alt="Inter University Logo" class="h-8 w-auto" />
+        <h1 class="text-lg md:text-xl font-bold text-blue-900 hidden sm:block">Inter University</h1>
+      </div>
+
+      <!-- Menú de Navegación (horizontal - desktop) -->
+      <div class="flex-1 mx-4 md:mx-8 hidden lg:block">
+        <p-menubar [model]="menuItems" styleClass="border-0 bg-transparent">
+          <ng-template pTemplate="end">
+            <!-- Usuario y Logout -->
+            <div class="flex items-center gap-3">
+              @if (currentUser(); as user) {
+                <div class="flex items-center gap-2">
+                  <p-avatar
+                    [label]="getUserInitials()"
+                    shape="circle"
+                    styleClass="bg-blue-500 text-white"
+                  />
+                  <div class="hidden xl:block">
+                    <p class="text-sm font-medium text-gray-900">{{ user.email }}</p>
+                    <p class="text-xs text-gray-500">Estudiante</p>
+                  </div>
+                </div>
+              }
+              <p-button
+                [text]="true"
+                [rounded]="true"
+                icon="pi pi-sign-out"
+                severity="danger"
+                (onClick)="logout()"
+                [ariaLabel]="'Cerrar sesión'"
+              />
+            </div>
+          </ng-template>
+        </p-menubar>
+      </div>
+
+      <!-- Usuario y Logout (móvil) -->
+      <div class="flex items-center gap-2 lg:hidden">
+        @if (currentUser(); as user) {
+          <p-avatar
+            [label]="getUserInitials()"
+            shape="circle"
+            styleClass="bg-blue-500 text-white"
+            size="normal"
+          />
+        }
+        <p-button
+          [text]="true"
+          [rounded]="true"
+          icon="pi pi-sign-out"
+          severity="danger"
+          (onClick)="logout()"
+          [ariaLabel]="'Cerrar sesión'"
+          size="small"
+        />
+      </div>
+    </div>
+  </nav>
+
+  <!-- Drawer para Menú Móvil -->
+  <p-drawer [(visible)]="mobileMenuVisible" [position]="'left'" [style]="{ width: '280px' }">
+    <ng-template pTemplate="header">
+      <div class="flex items-center gap-3">
+        <img src="/interu.webp" alt="Inter University Logo" class="h-8 w-auto" />
+        <span class="font-bold text-blue-900">Menú</span>
+      </div>
+    </ng-template>
+    
+    <div class="flex flex-col gap-4">
+      <!-- Información del usuario -->
+      @if (currentUser(); as user) {
+        <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+          <p-avatar
+            [label]="getUserInitials()"
+            shape="circle"
+            styleClass="bg-blue-500 text-white"
+            size="large"
+          />
+          <div>
+            <p class="text-sm font-medium text-gray-900">{{ user.email }}</p>
+            <p class="text-xs text-gray-500">Estudiante</p>
+          </div>
+        </div>
+      }
+      
+      <!-- Menú de navegación -->
+      <p-menu [model]="menuItems" styleClass="w-full border-0" />
+    </div>
+  </p-drawer>
+
+  <!-- Contenido Principal -->
+  <main class="pt-16 min-h-screen">
+    <div class="container mx-auto p-6">
+      <router-outlet />
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-200 py-4 px-6">
+    <div class="flex items-center justify-center">
+      <span class="text-sm text-gray-600">© 2026 Inter University - Portal del Estudiante</span>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,61 @@
+<app-page-header
+  [title]="'Detalle de Estudiante'"
+  [buttons]="headerButtons"
+/>
+
+@if (student(); as student) {
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Información General -->
+    <p-card header="Información General">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nombre</label>
+          <p class="text-lg">{{ student.name }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Código de Estudiante</label>
+          <p class="text-lg font-mono">{{ student.studentCode }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <p class="text-lg">{{ student.email }}</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Estado</label>
+          <p-tag
+            [severity]="getStatusSeverity(student.isActive)"
+            [value]="getStatusLabel(student.isActive)"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Fecha de Creación</label>
+          <p>{{ student.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Inscripciones -->
+    <p-card header="Inscripciones">
+      <p class="text-gray-600">Funcionalidad pendiente - Se mostrará la lista de materias inscritas</p>
+    </p-card>
+  </div>
+} @else if (loading()) {
+  <p-card>
+    <p class="text-center">Cargando estudiante...</p>
+  </p-card>
+} @else {
+  <p-card>
+    <p class="text-center text-red-500">Estudiante no encontrado</p>
+  </p-card>
+}
+
+<app-student-form
+  [visible]="showEditDialog()"
+  [student]="student()"
+  (onClose)="onEditClose()"
+  (onSuccess)="onEditSuccess()"
+/>

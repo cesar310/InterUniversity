@@ -1,0 +1,100 @@
+<div class="bg-surface-50 dark:bg-surface-950 px-6 py-20 md:px-20 lg:px-80 min-h-screen">
+    <div class="bg-surface-0 dark:bg-surface-900 p-8 md:p-12 shadow-sm rounded-2xl w-full max-w-md mx-auto flex flex-col gap-8">
+        @if (isVerifying()) {
+            <!-- Estado de Verificación -->
+            <div class="flex flex-col items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <img ngSrc="/interu.webp" alt="Inter University Logo" width="56" height="56" [disableOptimizedSrcset]="true" class="h-14 w-14" />
+                </div>
+                <div class="flex flex-col items-center gap-4 w-full">
+                    <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight text-center w-full">
+                        Verificando tu Correo
+                    </div>
+                    <p-progressSpinner 
+                        styleClass="w-16 h-16"
+                        strokeWidth="4"
+                        animationDuration="1s">
+                    </p-progressSpinner>
+                    <div class="text-center w-full text-surface-700 dark:text-surface-200 leading-normal text-sm">
+                        Por favor espera mientras verificamos tu correo electrónico...
+                    </div>
+                </div>
+            </div>
+        } @else if (verificationSuccess()) {
+            <!-- Verificación Exitosa -->
+            <div class="flex flex-col items-center gap-4">
+                <div class="flex items-center justify-center w-20 h-20 bg-green-500 rounded-full">
+                    <span class="text-white text-5xl font-bold leading-none">✓</span>
+                </div>
+                <div class="flex flex-col items-center gap-2 w-full">
+                    <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight text-center w-full">
+                        ¡Email Verificado!
+                    </div>
+                    <div class="text-center w-full text-surface-700 dark:text-surface-200 leading-normal">
+                        Tu correo electrónico ha sido verificado exitosamente. 
+                        Serás redirigido al login en unos segundos...
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full">
+                <button 
+                    pButton 
+                    type="button"
+                    (click)="goToLogin()"
+                    class="w-full py-2 rounded-lg flex justify-center items-center gap-2">
+                    <i pButtonIcon class="pi pi-sign-in text-base! leading-normal!"></i>
+                    <span pButtonLabel>Ir al Login Ahora</span>
+                </button>
+            </div>
+        } @else {
+            <!-- Error de Verificación -->
+            <div class="flex flex-col items-center gap-4">
+                <div class="flex items-center justify-center w-20 h-20 bg-red-500 rounded-full">
+                    <span class="text-white text-5xl font-bold leading-none">✗</span>
+                </div>
+                <div class="flex flex-col items-center gap-2 w-full">
+                    <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight text-center w-full">
+                        Error de Verificación
+                    </div>
+                    <div class="text-center w-full text-surface-700 dark:text-surface-200 leading-normal">
+                        {{ errorMessage() }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface-100 dark:bg-surface-800 p-4 rounded-lg">
+                <div class="text-surface-700 dark:text-surface-200 text-sm">
+                    <strong>Posibles causas:</strong>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li>El token de verificación ha expirado</li>
+                        <li>El enlace ya fue utilizado anteriormente</li>
+                        <li>El token es inválido o fue modificado</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full">
+                <button 
+                    pButton 
+                    type="button"
+                    (click)="goToResendVerification()"
+                    class="w-full py-2 rounded-lg flex justify-center items-center gap-2">
+                    <i pButtonIcon class="pi pi-send text-base! leading-normal!"></i>
+                    <span pButtonLabel>Solicitar Nuevo Enlace</span>
+                </button>
+
+                <button 
+                    pButton 
+                    type="button"
+                    severity="secondary"
+                    [outlined]="true"
+                    (click)="goToLogin()"
+                    class="w-full py-2 rounded-lg flex justify-center items-center gap-2">
+                    <i pButtonIcon class="pi pi-arrow-left text-base! leading-normal!"></i>
+                    <span pButtonLabel>Volver al Login</span>
+                </button>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,13 @@
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-3xl font-bold text-gray-900">{{ title() }}</h1>
+  <div class="flex gap-2">
+    @for (button of buttons(); track button.label) {
+      <p-button
+        [label]="button.label"
+        [icon]="button.icon"
+        [severity]="button.severity || 'primary'"
+        (onClick)="button.action()"
+      />
+    }
+  </div>
+</div>

@@ -1,0 +1,106 @@
+<div class="bg-surface-50 dark:bg-surface-950 px-6 py-20 md:px-20 lg:px-80 min-h-screen">
+    <div class="bg-surface-0 dark:bg-surface-900 p-8 md:p-12 shadow-sm rounded-2xl w-full max-w-md mx-auto flex flex-col gap-8">
+        @if (!emailSent()) {
+            <!-- Formulario de Reenvío -->
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-4">
+                    <img ngSrc="/interu.webp" alt="Inter University Logo" width="56" height="56" [disableOptimizedSrcset]="true" class="h-14 w-14" />
+                </div>
+                <div class="flex flex-col gap-2 w-full">
+                    <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight">
+                        Reenviar Verificación
+                    </div>
+                    <div class="text-surface-700 dark:text-surface-200 leading-normal">
+                        Ingresa tu correo electrónico y te enviaremos un nuevo enlace de verificación.
+                    </div>
+                </div>
+            </div>
+
+            <form (submit)="onSubmit(); $event.preventDefault()" class="flex flex-col gap-6">
+                <div class="flex flex-col gap-2 w-full">
+                    <label for="email" class="text-surface-900 dark:text-surface-0 leading-normal font-medium">
+                        Correo Electrónico
+                    </label>
+                    <input
+                        pInputText
+                        id="email"
+                        type="email"
+                        [field]="resendForm.email"
+                        placeholder="ejemplo@correo.com"
+                        class="w-full py-2 px-3 rounded-lg"
+                    />
+                    @if (resendForm.email().touched() && resendForm.email().invalid()) {
+                        <span class="text-red-500 text-sm">
+                            {{ resendForm.email().errors()[0].message }}
+                        </span>
+                    }
+                </div>
+
+                <div class="flex flex-col gap-3 w-full">
+                    <button 
+                        pButton 
+                        type="submit"
+                        [disabled]="isLoading()"
+                        [loading]="isLoading()"
+                        class="w-full py-2 rounded-lg flex justify-center items-center gap-2">
+                        <i pButtonIcon class="pi pi-send text-base! leading-normal!"></i>
+                        <span pButtonLabel>Enviar Enlace de Verificación</span>
+                    </button>
+
+                    <button 
+                        pButton 
+                        type="button"
+                        severity="secondary"
+                        [outlined]="true"
+                        (click)="goToLogin()"
+                        [disabled]="isLoading()"
+                        class="w-full py-2 rounded-lg flex justify-center items-center gap-2">
+                        <i pButtonIcon class="pi pi-arrow-left text-base! leading-normal!"></i>
+                        <span pButtonLabel>Volver al Login</span>
+                    </button>
+                </div>
+            </form>
+        } @else {
+            <!-- Mensaje de Éxito -->
+            <div class="flex flex-col items-center gap-4">
+                <div class="flex items-center justify-center w-20 h-20 bg-green-500 rounded-full">
+                    <span class="text-white text-5xl font-bold leading-none">✓</span>
+                </div>
+                <div class="flex flex-col items-center gap-2 w-full">
+                    <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight text-center w-full">
+                        ¡Correo Enviado!
+                    </div>
+                    <div class="text-center w-full text-surface-700 dark:text-surface-200 leading-normal">
+                        Hemos enviado un nuevo correo de verificación a tu dirección de email.
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface-100 dark:bg-surface-800 p-4 rounded-lg">
+                <div class="text-surface-700 dark:text-surface-200 text-sm">
+                    <strong>Próximos pasos:</strong>
+                    <ol class="list-decimal list-inside mt-2 space-y-1">
+                        <li>Revisa tu bandeja de entrada</li>
+                        <li>Busca el correo de Inter University</li>
+                        <li>Haz clic en el enlace de verificación</li>
+                        <li>Inicia sesión una vez verificado</li>
+                    </ol>
+                </div>
+                <div class="text-surface-600 dark:text-surface-300 text-xs mt-3">
+                    ¿No ves el correo? Revisa tu carpeta de spam o correo no deseado.
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full">
+                <button 
+                    pButton 
+                    type="button"
+                    (click)="goToLogin()"
+                    class="w-full py-2 rounded-lg flex justify-center items-center gap-2">
+                    <i pButtonIcon class="pi pi-sign-in text-base! leading-normal!"></i>
+                    <span pButtonLabel>Ir al Login</span>
+                </button>
+            </div>
+        }
+    </div>
+</div>

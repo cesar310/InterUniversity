@@ -1,0 +1,109 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Navbar Superior -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16">
+    <div class="flex items-center justify-between h-full px-4">
+      <!-- Logo y Toggle -->
+      <div class="flex items-center gap-3">
+        <p-button
+          [text]="true"
+          [rounded]="true"
+          icon="pi pi-bars"
+          severity="secondary"
+          (onClick)="toggleSidebar()"
+          [ariaLabel]="'Toggle menu'"
+        />
+        <img src="/interu.webp" alt="Inter University Logo" class="h-8 w-auto" />
+        <h1 class="text-lg md:text-xl font-bold text-blue-900 hidden sm:block">Inter University</h1>
+      </div>
+
+      <!-- Usuario y Logout -->
+      <div class="flex items-center gap-2 md:gap-3">
+        @if (currentUser(); as user) {
+          <div class="flex items-center gap-2">
+            <p-avatar
+              [label]="getUserInitials()"
+              shape="circle"
+              styleClass="bg-blue-500 text-white"
+              size="normal"
+            />
+            <div class="hidden md:block">
+              <p class="text-sm font-medium text-gray-900">{{ user.email }}</p>
+              <p class="text-xs text-gray-500">Administrador</p>
+            </div>
+          </div>
+        }
+        <p-button
+          [text]="true"
+          [rounded]="true"
+          icon="pi pi-sign-out"
+          severity="danger"
+          (onClick)="logout()"
+          [ariaLabel]="'Cerrar sesión'"
+          size="small"
+        />
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenedor Principal -->
+  <div class="flex flex-col min-h-screen pt-16">
+    <!-- Sidebar y Contenido -->
+    <div class="flex flex-1">
+      <!-- Sidebar Desktop (oculto en móviles) -->
+      @if (sidebarVisible()) {
+        <aside class="hidden lg:block fixed left-0 top-16 bottom-16 w-64 bg-white border-r border-gray-200 overflow-y-auto">
+          <div class="p-4">
+            <p-menu [model]="menuItems" styleClass="w-full border-0" />
+          </div>
+        </aside>
+      }
+
+      <!-- Drawer Móvil (visible solo en móviles) -->
+      <p-drawer [(visible)]="sidebarVisible" [position]="'left'" [style]="{ width: '280px' }" styleClass="lg:hidden">
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-3">
+            <img src="/interu.webp" alt="Inter University Logo" class="h-8 w-auto" />
+            <span class="font-bold text-blue-900">Menú Admin</span>
+          </div>
+        </ng-template>
+        
+        <div class="flex flex-col gap-4">
+          <!-- Información del usuario -->
+          @if (currentUser(); as user) {
+            <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+              <p-avatar
+                [label]="getUserInitials()"
+                shape="circle"
+                styleClass="bg-blue-500 text-white"
+                size="large"
+              />
+              <div>
+                <p class="text-sm font-medium text-gray-900">{{ user.email }}</p>
+                <p class="text-xs text-gray-500">Administrador</p>
+              </div>
+            </div>
+          }
+          
+          <!-- Menú de navegación -->
+          <p-menu [model]="menuItems" styleClass="w-full border-0" />
+        </div>
+      </p-drawer>
+
+      <!-- Contenido Principal -->
+      <main
+        class="flex-1 p-4 md:p-6 transition-all duration-300"
+        [class.lg:ml-64]="sidebarVisible()"
+        [class.lg:ml-0]="!sidebarVisible()"
+      >
+        <router-outlet />
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-4 px-6">
+      <div class="flex items-center justify-center">
+        <span class="text-sm text-gray-600">© 2026 Inter University - Sistema de Matrícula</span>
+      </div>
+    </footer>
+  </div>
+</div>

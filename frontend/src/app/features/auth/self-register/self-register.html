@@ -1,0 +1,231 @@
+<div class="bg-surface-50 dark:bg-surface-950 px-6 py-20 md:px-20 lg:px-80 min-h-screen">
+    @if (!registrationSuccess()) {
+        <!-- Formulario de Registro -->
+        <div class="bg-surface-0 dark:bg-surface-900 p-8 md:p-12 shadow-sm rounded-2xl w-full max-w-md mx-auto flex flex-col gap-8">
+            <div class="flex flex-col items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <img ngSrc="/interu.webp" alt="Inter University Logo" width="56" height="56" [disableOptimizedSrcset]="true" class="h-14 w-14" />
+                </div>
+                <div class="flex flex-col items-center gap-2 w-full">
+                    <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight text-center w-full">
+                        Crear Cuenta
+                    </div>
+                    <div class="text-center w-full">
+                        <span class="text-surface-700 dark:text-surface-200 leading-normal">¿Ya tienes una cuenta?</span>
+                        <a 
+                            routerLink="/auth/login" 
+                            class="text-primary font-medium ml-1 cursor-pointer hover:text-primary-emphasis">
+                            Inicia sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <form (submit)="onSubmit(); $event.preventDefault()" class="flex flex-col gap-6 w-full">
+                <!-- Nombre Completo -->
+                <div class="flex flex-col gap-2 w-full">
+                    <label 
+                        for="name" 
+                        class="text-surface-900 dark:text-surface-0 font-medium leading-normal">
+                        Nombre Completo
+                    </label>
+                    <input 
+                        pInputText 
+                        id="name" 
+                        type="text" 
+                        placeholder="Juan Pérez"
+                        [field]="registerForm.name"
+                        autocomplete="name"
+                        class="w-full px-3 py-2 shadow-sm rounded-lg" 
+                    />
+                    @if (registerForm.name().touched() && registerForm.name().invalid()) {
+                        <span class="text-red-500 text-sm">
+                            {{ registerForm.name().errors()[0].message }}
+                        </span>
+                    }
+                </div>
+
+                <!-- Correo Electrónico -->
+                <div class="flex flex-col gap-2 w-full">
+                    <label 
+                        for="email" 
+                        class="text-surface-900 dark:text-surface-0 font-medium leading-normal">
+                        Correo Electrónico
+                    </label>
+                    <input 
+                        pInputText 
+                        id="email" 
+                        type="email" 
+                        placeholder="correo@ejemplo.com"
+                        [field]="registerForm.email"
+                        autocomplete="email"
+                        class="w-full px-3 py-2 shadow-sm rounded-lg" 
+                    />
+                    @if (registerForm.email().touched() && registerForm.email().invalid()) {
+                        <span class="text-red-500 text-sm">
+                            {{ registerForm.email().errors()[0].message }}
+                        </span>
+                    }
+                </div>
+
+                <!-- Contraseña -->
+                <div class="flex flex-col gap-2 w-full">
+                    <label 
+                        for="password" 
+                        class="text-surface-900 dark:text-surface-0 font-medium leading-normal">
+                        Contraseña
+                    </label>
+                    <p-iconfield iconPosition="right">
+                        <p-inputicon 
+                            [styleClass]="showPassword() ? 'pi pi-eye-slash cursor-pointer' : 'pi pi-eye cursor-pointer'"
+                            (click)="togglePasswordVisibility()"
+                        />
+                        <input 
+                            pInputText 
+                            id="password" 
+                            [type]="showPassword() ? 'text' : 'password'"
+                            placeholder="Contraseña"
+                            [field]="registerForm.password"
+                            autocomplete="new-password"
+                            class="w-full px-3 py-2 shadow-sm rounded-lg" 
+                        />
+                    </p-iconfield>
+                    @if (registerForm.password().touched() && registerForm.password().invalid()) {
+                        <span class="text-red-500 text-sm">
+                            {{ registerForm.password().errors()[0].message }}
+                        </span>
+                    }
+
+                    <!-- Mensaje de error de complejidad -->
+                    @if (registerModel().password && hasComplexityError()) {
+                        <span class="text-red-500 text-sm">
+                            Debe contener mayúsculas, minúsculas, números y símbolos especiales (@$!%*?&)
+                        </span>
+                    }
+
+                    <!-- Indicador de Fortaleza -->
+                    @if (registerModel().password) {
+                        <div class="flex flex-col gap-2">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-surface-700 dark:text-surface-200">Fortaleza:</span>
+                                <span 
+                                    [class]="'font-semibold ' + 
+                                        (passwordStrength().color === 'danger' ? 'text-red-500' : 
+                                         passwordStrength().color === 'warn' ? 'text-yellow-500' : 
+                                         'text-green-500')">
+                                    {{ passwordStrength().label }}
+                                </span>
+                            </div>
+                            <p-progressBar 
+                                [value]="passwordStrength().value"
+                                [showValue]="false"
+                                [style]="{'height': '6px'}">
+                            </p-progressBar>
+                            <div class="text-xs text-surface-600 dark:text-surface-400">
+                                Mínimo 8 caracteres, con mayúsculas, minúsculas, números y símbolos
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Confirmar Contraseña -->
+                <div class="flex flex-col gap-2 w-full">
+                    <label 
+                        for="confirmPassword" 
+                        class="text-surface-900 dark:text-surface-0 font-medium leading-normal">
+                        Confirmar Contraseña
+                    </label>
+                    <p-iconfield iconPosition="right">
+                        <p-inputicon 
+                            [styleClass]="showConfirmPassword() ? 'pi pi-eye-slash cursor-pointer' : 'pi pi-eye cursor-pointer'"
+                            (click)="toggleConfirmPasswordVisibility()"
+                        />
+                        <input 
+                            pInputText 
+                            id="confirmPassword" 
+                            [type]="showConfirmPassword() ? 'text' : 'password'"
+                            placeholder="Confirma tu contraseña"
+                            [field]="registerForm.confirmPassword"
+                            autocomplete="new-password"
+                            class="w-full px-3 py-2 shadow-sm rounded-lg" 
+                        />
+                    </p-iconfield>
+                    @if (registerForm.confirmPassword().touched() && registerForm.confirmPassword().invalid()) {
+                        <span class="text-red-500 text-sm">
+                            {{ registerForm.confirmPassword().errors()[0].message }}
+                        </span>
+                    }
+                    
+                    <!-- Advertencia si las contraseñas no coinciden -->
+                    @if (registerModel().confirmPassword && !passwordsMatch()) {
+                        <span class="text-red-500 text-sm">
+                            Las contraseñas no coinciden
+                        </span>
+                    }
+                </div>
+
+                <!-- Botones -->
+                <div class="flex flex-col gap-3 w-full">
+                    <button 
+                        pButton 
+                        type="submit"
+                        [disabled]="registerForm().invalid() || isLoading() || !passwordsMatch() || hasComplexityError()"
+                        [loading]="isLoading()"
+                        class="w-full py-2 rounded-lg flex justify-center items-center gap-2">
+                        <i pButtonIcon class="pi pi-user-plus text-base! leading-normal!"></i>
+                        <span pButtonLabel>Crear Cuenta</span>
+                    </button>
+
+                    <button 
+                        pButton 
+                        type="button"
+                        severity="secondary"
+                        [outlined]="true"
+                        routerLink="/auth/login"
+                        class="w-full py-2 rounded-lg flex justify-center items-center gap-2">
+                        <i pButtonIcon class="pi pi-arrow-left text-base! leading-normal!"></i>
+                        <span pButtonLabel>Volver al Login</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    } @else {
+        <!-- Mensaje de Éxito -->
+        <div class="bg-surface-0 dark:bg-surface-900 p-8 md:p-12 shadow-sm rounded-2xl w-full max-w-md mx-auto flex flex-col gap-8">
+            <div class="flex flex-col items-center gap-4">
+                <div class="flex items-center justify-center w-20 h-20 bg-green-500 rounded-full">
+                    <span class="text-white text-5xl font-bold leading-none">✓</span>
+                </div>
+                <div class="flex flex-col items-center gap-2 w-full">
+                    <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight text-center w-full">
+                        ¡Registro Exitoso!
+                    </div>
+                    <div class="text-center w-full text-surface-700 dark:text-surface-200 leading-normal">
+                        Hemos enviado un correo de verificación a tu dirección de email. 
+                        Por favor, revisa tu bandeja de entrada y haz clic en el enlace de verificación para activar tu cuenta.
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full">
+                <button 
+                    pButton 
+                    type="button"
+                    (click)="goToLogin()"
+                    class="w-full py-2 rounded-lg flex justify-center items-center gap-2">
+                    <i pButtonIcon class="pi pi-sign-in text-base! leading-normal!"></i>
+                    <span pButtonLabel>Ir al Login</span>
+                </button>
+
+                <div class="text-center text-sm">
+                    <span class="text-surface-700 dark:text-surface-200">¿No recibiste el correo?</span>
+                    <a 
+                        routerLink="/auth/resend-verification" 
+                        class="text-primary font-medium ml-1 cursor-pointer hover:text-primary-emphasis">
+                        Reenviar verificación
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

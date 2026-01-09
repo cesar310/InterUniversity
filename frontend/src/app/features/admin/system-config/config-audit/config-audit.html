@@ -1,0 +1,167 @@
+<app-page-header
+  [title]="'Historial de Auditoría de Configuraciones'"
+  [buttons]="headerButtons"
+/>
+
+<p-card>
+  <!-- Filtros -->
+  <div class="mb-4 flex flex-wrap gap-4">
+    <div class="flex-1 min-w-50">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Clave</label>
+      <p-select
+        [(ngModel)]="selectedKey"
+        [options]="configKeys()"
+        placeholder="Todas las configuraciones"
+        [showClear]="true"
+        class="w-full"
+      />
+    </div>
+
+    <div class="flex-1 min-w-62.5">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Rango de Fechas</label>
+      <p-datepicker
+        [(ngModel)]="dateRange"
+        selectionMode="range"
+        [showIcon]="true"
+        placeholder="Seleccionar rango"
+        dateFormat="dd/mm/yy"
+        class="w-full"
+      />
+    </div>
+
+    <div class="flex items-end gap-2">
+      <p-button
+        label="Limpiar Filtros"
+        icon="pi pi-filter-slash"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="clearFilters()"
+      />
+      <p-button
+        [icon]="viewMode() === 'table' ? 'pi pi-clock' : 'pi pi-table'"
+        [label]="viewMode() === 'table' ? 'Vista Timeline' : 'Vista Tabla'"
+        severity="info"
+        [outlined]="true"
+        (onClick)="toggleViewMode()"
+      />
+    </div>
+  </div>
+
+  <!-- Vista Tabla -->
+  @if (viewMode() === 'table') {
+    <p-table
+      [value]="filteredLogs()"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="15"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} cambios"
+      [rowsPerPageOptions]="[10, 15, 25, 50]"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Fecha y Hora</th>
+          <th>Clave de Configuración</th>
+          <th>Valor Anterior</th>
+          <th>Valor Nuevo</th>
+          <th>Modificado Por</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-log>
+        <tr>
+          <td>
+            <span class="text-sm font-mono">{{ formatDate(log.changedAt) }}</span>
+          </td>
+          <td>
+            <p-tag [value]="log.configKey" severity="secondary" />
+          </td>
+          <td>
+            <span class="font-mono text-gray-600">{{ log.oldValue }}</span>
+          </td>
+          <td>
+            <span class="font-mono font-semibold" [ngClass]="getChangeColor(log)">
+              {{ log.newValue }}
+            </span>
+          </td>
+          <td>
+            <div class="flex items-center gap-2">
+              <i class="pi pi-user text-gray-500"></i>
+              <span class="text-sm">{{ log.changedBy }}</span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center">
+            <div class="py-8">
+              <i class="pi pi-inbox text-5xl text-gray-400 mb-3"></i>
+              <p class="text-gray-500 text-lg">No hay cambios registrados</p>
+              @if (selectedKey() || dateRange()) {
+                <p class="text-gray-400 text-sm mt-2">Intenta ajustar los filtros</p>
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+
+  <!-- Vista Timeline -->
+  @if (viewMode() === 'timeline') {
+    <div class="timeline-container">
+      @if (filteredLogs().length > 0) {
+        <p-timeline [value]="filteredLogs()" align="alternate">
+          <ng-template pTemplate="content" let-log>
+            <p-card class="shadow-sm">
+              <div class="mb-2">
+                <p-tag [value]="log.configKey" severity="info" class="mb-2" />
+              </div>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2 text-sm">
+                  <i class="pi pi-calendar text-gray-500"></i>
+                  <span class="text-gray-600">{{ formatDateShort(log.changedAt) }}</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <i class="pi pi-user text-gray-500"></i>
+                  <span class="text-gray-600">{{ log.changedBy }}</span>
+                </div>
+                <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+                  <div class="flex items-center justify-between">
+                    <div class="text-center flex-1">
+                      <div class="text-xs text-gray-500 mb-1">Anterior</div>
+                      <div class="font-mono text-sm text-gray-700">{{ log.oldValue }}</div>
+                    </div>
+                    <div class="px-3">
+                      <i class="pi pi-arrow-right text-gray-400"></i>
+                    </div>
+                    <div class="text-center flex-1">
+                      <div class="text-xs text-gray-500 mb-1">Nuevo</div>
+                      <div class="font-mono text-sm font-semibold" [ngClass]="getChangeColor(log)">
+                        {{ log.newValue }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </p-card>
+          </ng-template>
+          <ng-template pTemplate="marker" let-log>
+            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white shadow-lg">
+              <i class="pi pi-pencil text-xs"></i>
+            </div>
+          </ng-template>
+        </p-timeline>
+      } @else {
+        <div class="text-center py-12">
+          <i class="pi pi-inbox text-5xl text-gray-400 mb-3"></i>
+          <p class="text-gray-500 text-lg">No hay cambios registrados</p>
+          @if (selectedKey() || dateRange()) {
+            <p class="text-gray-400 text-sm mt-2">Intenta ajustar los filtros</p>
+          }
+        </div>
+      }
+    </div>
+  }
+</p-card>

@@ -1,0 +1,108 @@
+<app-page-header
+  [title]="'Gestión de Profesores'"
+  [buttons]="headerButtons"
+/>
+
+<p-card>
+  <div class="mb-4">
+    <p-iconfield iconPosition="left">
+      <p-inputicon styleClass="pi pi-search" />
+      <input
+        pInputText
+        type="text"
+        placeholder="Buscar profesores..."
+        [(ngModel)]="searchTerm"
+        (keydown.enter)="onSearch()"
+        class="w-full"
+      />
+    </p-iconfield>
+  </div>
+
+  <p-table
+    [value]="professors()"
+    [loading]="loading()"
+    [paginator]="true"
+    [rows]="10"
+    [lazy]="true"
+    [totalRecords]="totalRecords()"
+    (onLazyLoad)="loadProfessors($event)"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} profesores"
+    [rowsPerPageOptions]="[5, 10, 25]"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nombre</th>
+        <th>Especialización</th>
+        <th>Email</th>
+        <th>Teléfono</th>
+        <th>Materias Activas</th>
+        <th>Disponibilidad</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-professor>
+      <tr>
+        <td>{{ professor.name }}</td>
+        <td>{{ professor.specialization }}</td>
+        <td>{{ professor.email }}</td>
+        <td>{{ professor.phone || 'N/A' }}</td>
+        <td>
+           {{ professor.totalSubjects ?? professor.activeSubjectsCount ?? 0 }} / {{ professor.maxAllowed ?? professor.maxSubjects ?? 3 }}
+        </td>
+        <td>
+           <p-tag
+            [severity]="getAvailabilitySeverity(professor)"
+            [value]="getAvailabilityLabel(professor)"
+          />
+        </td>
+        <td>
+          <p-tag
+            [severity]="getStatusSeverity(professor.isActive)"
+            [value]="professor.isActive ? 'Activo' : 'Inactivo'"
+          />
+        </td>
+        <td>
+          <div class="flex gap-2">
+            <p-button
+              icon="pi pi-pencil"
+              severity="secondary"
+              [text]="true"
+              [rounded]="true"
+              pTooltip="Editar"
+              tooltipPosition="top"
+              (onClick)="editProfessor(professor)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [text]="true"
+              [rounded]="true"
+              pTooltip="Eliminar"
+              tooltipPosition="top"
+              (onClick)="deleteProfessor(professor)"
+            />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+     <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center py-4">
+          No se encontraron profesores
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+<app-professor-form
+  [visible]="showFormDialog()"
+  [professor]="selectedProfessor()"
+  (onClose)="onFormClose()"
+  (onSuccess)="onFormSuccess()"
+/>
+
+<p-confirmDialog />

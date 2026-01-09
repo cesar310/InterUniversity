@@ -1,0 +1,98 @@
+<p-dialog 
+    [visible]="visible()" 
+    [modal]="true" 
+    [header]="dialogTitle()" 
+    [style]="{ width: '450px' }"
+    [breakpoints]="{'960px': '75vw', '640px': '95vw'}"
+    [closable]="true"
+    (onHide)="handleCancel()">
+    
+    <div class="flex flex-col gap-4">
+        <!-- Name -->
+        <div class="flex flex-col gap-2">
+            <label for="name" class="font-medium">Nombre</label>
+            <input 
+                pInputText 
+                id="name" 
+                [field]="professorForm.name" 
+                placeholder="Nombre completo" 
+                class="w-full"
+            />
+            @if (professorForm.name().touched() && professorForm.name().invalid()) {
+                <small class="text-red-500">
+                    {{ professorForm.name().errors()[0]?.message || 'Requerido (min 3 caracteres)' }}
+                </small>
+            }
+        </div>
+
+        <!-- Specialization -->
+        <div class="flex flex-col gap-2">
+            <label for="specialization" class="font-medium">Especialización</label>
+            <input 
+                pInputText 
+                id="specialization" 
+                [field]="professorForm.specialization"
+                placeholder="Especialización" 
+                class="w-full"
+            />
+             @if (professorForm.specialization().touched() && professorForm.specialization().invalid()) {
+                <small class="text-red-500">
+                     {{ professorForm.specialization().errors()[0]?.message || 'Requerido' }}
+                </small>
+            }
+        </div>
+
+        <!-- Email -->
+        <div class="flex flex-col gap-2">
+            <label for="email" class="font-medium">Email (Opcional)</label>
+            <input 
+                pInputText 
+                id="email" 
+                type="email"
+                [field]="professorForm.email"
+                placeholder="correo@ejemplo.com" 
+                class="w-full"
+            />
+             @if (professorForm.email().touched() && professorForm.email().invalid()) {
+                <small class="text-red-500">Email inválido</small>
+            }
+        </div>
+
+        <!-- Phone -->
+        <div class="flex flex-col gap-2">
+            <label for="phone" class="font-medium">Teléfono (Opcional)</label>
+            <input 
+                pInputText 
+                id="phone" 
+                [field]="professorForm.phone"
+                placeholder="+1234567890" 
+                class="w-full"
+            />
+        </div>
+
+        <!-- Active Status -->
+        <div class="flex items-center gap-2">
+             <p-checkbox 
+                inputId="isActive" 
+                [binary]="true" 
+                [field]="professorForm.isActive"
+            />
+            <label for="isActive">Activo</label>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button 
+            label="Cancelar" 
+            icon="pi pi-times" 
+            [text]="true" 
+            (onClick)="handleCancel()" 
+        />
+        <p-button 
+            label="Guardar" 
+            icon="pi pi-check" 
+            [loading]="loading()" 
+            (onClick)="handleSubmit()" 
+        />
+    </ng-template>
+</p-dialog>

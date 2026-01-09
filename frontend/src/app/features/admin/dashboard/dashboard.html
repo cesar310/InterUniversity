@@ -1,0 +1,274 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <!-- Total Estudiantes -->
+  <p-card class="bg-blue-50 border-blue-200">
+    <ng-template pTemplate="header">
+      <div class="flex items-center justify-center h-16 bg-blue-500 text-white rounded-t-lg">
+        <i [class]="icons.users" class="text-2xl"></i>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="title">
+      <h3 class="text-lg font-semibold text-blue-800">Total Estudiantes</h3>
+    </ng-template>
+    <ng-template pTemplate="content">
+      @if (loading()) {
+        <p-skeleton width="4rem" height="2rem"></p-skeleton>
+      } @else {
+        <p class="text-3xl font-bold text-blue-600">{{ stats()?.totalStudents ?? 0 }}</p>
+      }
+    </ng-template>
+  </p-card>
+
+  <!-- Total Profesores -->
+  <p-card class="bg-green-50 border-green-200">
+    <ng-template pTemplate="header">
+      <div class="flex items-center justify-center h-16 bg-green-500 text-white rounded-t-lg">
+        <i [class]="icons.idCard" class="text-2xl"></i>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="title">
+      <h3 class="text-lg font-semibold text-green-800">Total Profesores</h3>
+    </ng-template>
+    <ng-template pTemplate="content">
+      @if (loading()) {
+        <p-skeleton width="4rem" height="2rem"></p-skeleton>
+      } @else {
+        <p class="text-3xl font-bold text-green-600">{{ stats()?.totalProfessors ?? 0 }}</p>
+      }
+    </ng-template>
+  </p-card>
+
+  <!-- Materias Activas -->
+  <p-card class="bg-purple-50 border-purple-200">
+    <ng-template pTemplate="header">
+      <div class="flex items-center justify-center h-16 bg-purple-500 text-white rounded-t-lg">
+        <i [class]="icons.book" class="text-2xl"></i>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="title">
+      <h3 class="text-lg font-semibold text-purple-800">Materias Activas</h3>
+    </ng-template>
+    <ng-template pTemplate="content">
+      @if (loading()) {
+        <p-skeleton width="4rem" height="2rem"></p-skeleton>
+      } @else {
+        <p class="text-3xl font-bold text-purple-600">{{ stats()?.activeSubjects ?? 0 }}</p>
+      }
+    </ng-template>
+  </p-card>
+
+  <!-- Inscripciones Activas -->
+  <p-card class="bg-orange-50 border-orange-200">
+    <ng-template pTemplate="header">
+      <div class="flex items-center justify-center h-16 bg-orange-500 text-white rounded-t-lg">
+        <i [class]="icons.checkCircle" class="text-2xl"></i>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="title">
+      <h3 class="text-lg font-semibold text-orange-800">Inscripciones Activas</h3>
+    </ng-template>
+    <ng-template pTemplate="content">
+      @if (loading()) {
+        <p-skeleton width="4rem" height="2rem"></p-skeleton>
+      } @else {
+        <p class="text-3xl font-bold text-orange-600">{{ stats()?.activeEnrollments ?? 0 }}</p>
+      }
+    </ng-template>
+  </p-card>
+
+  <!-- Promedio Materias/Estudiante -->
+  <p-card class="bg-teal-50 border-teal-200">
+    <ng-template pTemplate="header">
+      <div class="flex items-center justify-center h-16 bg-teal-500 text-white rounded-t-lg">
+        <i [class]="icons.chartLine" class="text-2xl"></i>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="title">
+      <h3 class="text-lg font-semibold text-teal-800">Promedio Materias/Estudiante</h3>
+    </ng-template>
+    <ng-template pTemplate="content">
+      @if (loading()) {
+        <p-skeleton width="4rem" height="2rem"></p-skeleton>
+      } @else {
+        <p class="text-3xl font-bold text-teal-600">{{ (stats()?.avgSubjectsPerStudent ?? 0).toFixed(1) }}</p>
+      }
+    </ng-template>
+  </p-card>
+
+  <!-- Máximo Materias Inscritas -->
+  <p-card class="bg-red-50 border-red-200">
+    <ng-template pTemplate="header">
+      <div class="flex items-center justify-center h-16 bg-red-500 text-white rounded-t-lg">
+        <i [class]="icons.star" class="text-2xl"></i>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="title">
+      <h3 class="text-lg font-semibold text-red-800">Máximo Materias Inscritas</h3>
+    </ng-template>
+    <ng-template pTemplate="content">
+      @if (loading()) {
+        <p-skeleton width="4rem" height="2rem"></p-skeleton>
+      } @else {
+        <p class="text-3xl font-bold text-red-600">{{ stats()?.maxSubjectsEnrolled ?? 0 }}</p>
+      }
+    </ng-template>
+  </p-card>
+</div>
+
+<!-- Configuraciones del Sistema -->
+<div class="mt-8">
+  <h2 class="text-2xl font-bold mb-4 text-gray-800">
+    <i [class]="icons.cog" class="mr-2"></i>
+    Configuraciones del Sistema
+  </h2>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Límite Materias por Estudiante -->
+    <p-card class="bg-indigo-50 border-indigo-200">
+      <ng-template pTemplate="title">
+        <h3 class="text-sm font-semibold text-indigo-800">Límite Materias por Estudiante</h3>
+      </ng-template>
+      <ng-template pTemplate="content">
+        @if (configService.loaded()) {
+          <p class="text-2xl font-bold text-indigo-600">{{ configService.maxSubjectsPerStudent() }}</p>
+          <p class="text-xs text-gray-600 mt-1">máximo permitido</p>
+        } @else {
+          <p-skeleton width="3rem" height="2rem"></p-skeleton>
+        }
+      </ng-template>
+    </p-card>
+
+    <!-- Mínimo Materias por Estudiante -->
+    <p-card class="bg-indigo-50 border-indigo-200">
+      <ng-template pTemplate="title">
+        <h3 class="text-sm font-semibold text-indigo-800">Mínimo Materias por Estudiante</h3>
+      </ng-template>
+      <ng-template pTemplate="content">
+        @if (configService.loaded()) {
+          <p class="text-2xl font-bold text-indigo-600">{{ configService.minSubjectsPerStudent() }}</p>
+          <p class="text-xs text-gray-600 mt-1">mínimo requerido</p>
+        } @else {
+          <p-skeleton width="3rem" height="2rem"></p-skeleton>
+        }
+      </ng-template>
+    </p-card>
+
+    <!-- Límite Materias por Profesor -->
+    <p-card class="bg-indigo-50 border-indigo-200">
+      <ng-template pTemplate="title">
+        <h3 class="text-sm font-semibold text-indigo-800">Límite Materias por Profesor</h3>
+      </ng-template>
+      <ng-template pTemplate="content">
+        @if (configService.loaded()) {
+          <p class="text-2xl font-bold text-indigo-600">{{ configService.maxSubjectsPerProfessor() }}</p>
+          <p class="text-xs text-gray-600 mt-1">máximo permitido</p>
+        } @else {
+          <p-skeleton width="3rem" height="2rem"></p-skeleton>
+        }
+      </ng-template>
+    </p-card>
+
+    <!-- Créditos por Defecto -->
+    <p-card class="bg-indigo-50 border-indigo-200">
+      <ng-template pTemplate="title">
+        <h3 class="text-sm font-semibold text-indigo-800">Créditos por Defecto</h3>
+      </ng-template>
+      <ng-template pTemplate="content">
+        @if (configService.loaded()) {
+          <p class="text-2xl font-bold text-indigo-600">{{ configService.defaultSubjectCredits() }}</p>
+          <p class="text-xs text-gray-600 mt-1">créditos</p>
+        } @else {
+          <p-skeleton width="3rem" height="2rem"></p-skeleton>
+        }
+      </ng-template>
+    </p-card>
+
+    <!-- Periodo Académico -->
+    <p-card class="bg-sky-50 border-sky-200">
+      <ng-template pTemplate="title">
+        <h3 class="text-sm font-semibold text-sky-800">Periodo Académico</h3>
+      </ng-template>
+      <ng-template pTemplate="content">
+        @if (configService.loaded()) {
+          <p class="text-xl font-bold text-sky-600">{{ configService.academicPeriod() }}</p>
+          <p class="text-xs text-gray-600 mt-1">periodo actual</p>
+        } @else {
+          <p-skeleton width="4rem" height="2rem"></p-skeleton>
+        }
+      </ng-template>
+    </p-card>
+
+    <!-- Estado de Inscripciones -->
+    <p-card [ngClass]="configService.enrollmentOpen() ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'">
+      <ng-template pTemplate="title">
+        <h3 class="text-sm font-semibold" [ngClass]="configService.enrollmentOpen() ? 'text-green-800' : 'text-red-800'">
+          Estado de Inscripciones
+        </h3>
+      </ng-template>
+      <ng-template pTemplate="content">
+        @if (configService.loaded()) {
+          <div class="flex items-center gap-2">
+            <i [class]="configService.enrollmentOpen() ? 'pi pi-check-circle text-green-600' : 'pi pi-times-circle text-red-600'" 
+               class="text-2xl"></i>
+            <p class="text-lg font-bold" [ngClass]="configService.enrollmentOpen() ? 'text-green-600' : 'text-red-600'">
+              {{ configService.enrollmentOpen() ? 'Abiertas' : 'Cerradas' }}
+            </p>
+          </div>
+          <p class="text-xs text-gray-600 mt-1">
+            {{ configService.enrollmentOpen() ? 'Los estudiantes pueden inscribirse' : 'Inscripciones deshabilitadas' }}
+          </p>
+        } @else {
+          <p-skeleton width="5rem" height="2rem"></p-skeleton>
+        }
+      </ng-template>
+    </p-card>
+
+    <!-- Permitir Mismo Profesor -->
+    <p-card [ngClass]="configService.allowSameProfessor() ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'">
+      <ng-template pTemplate="title">
+        <h3 class="text-sm font-semibold" [ngClass]="configService.allowSameProfessor() ? 'text-green-800' : 'text-amber-800'">
+          Materias del Mismo Profesor
+        </h3>
+      </ng-template>
+      <ng-template pTemplate="content">
+        @if (configService.loaded()) {
+          <div class="flex items-center gap-2">
+            <i [class]="configService.allowSameProfessor() ? 'pi pi-check-circle text-green-600' : 'pi pi-ban text-amber-600'" 
+               class="text-2xl"></i>
+            <p class="text-lg font-bold" [ngClass]="configService.allowSameProfessor() ? 'text-green-600' : 'text-amber-600'">
+              {{ configService.allowSameProfessor() ? 'Permitido' : 'Restringido' }}
+            </p>
+          </div>
+          <p class="text-xs text-gray-600 mt-1">
+            {{ configService.allowSameProfessor() ? 'Sin límite de materias por profesor' : 'Máximo 2 materias del mismo profesor' }}
+          </p>
+        } @else {
+          <p-skeleton width="5rem" height="2rem"></p-skeleton>
+        }
+      </ng-template>
+    </p-card>
+
+    <!-- Nombre del Sistema -->
+    <p-card class="bg-slate-50 border-slate-200">
+      <ng-template pTemplate="title">
+        <h3 class="text-sm font-semibold text-slate-800">Nombre del Sistema</h3>
+      </ng-template>
+      <ng-template pTemplate="content">
+        @if (configService.loaded()) {
+          <p class="text-base font-semibold text-slate-700 wrap-break-word">{{ configService.systemName() }}</p>
+          <p class="text-xs text-gray-600 mt-1">sistema actual</p>
+        } @else {
+          <p-skeleton width="100%" height="2rem"></p-skeleton>
+        }
+      </ng-template>
+    </p-card>
+  </div>
+
+  @if (configService.error()) {
+    <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <p class="text-yellow-800">
+        <i class="pi pi-exclamation-triangle mr-2"></i>
+        No se pudieron cargar las configuraciones desde la base de datos. Usando valores por defecto.
+      </p>
+    </div>
+  }
+</div>

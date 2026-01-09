@@ -1,0 +1,125 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [header]="dialogTitle()"
+  [style]="{ width: '500px' }"
+  [breakpoints]="{'960px': '75vw', '640px': '95vw'}"
+  [closable]="true"
+  (onHide)="handleCancel()"
+>
+  <div class="flex flex-col gap-4">
+    <!-- Name -->
+    <div class="flex flex-col gap-2">
+      <label for="name" class="font-medium">Nombre de la Materia</label>
+      <input
+        pInputText
+        id="name"
+        [field]="registerForm.name"
+        placeholder="Ej. Cálculo I"
+        class="w-full"
+      />
+      @if (registerForm.name().touched() && registerForm.name().invalid()) {
+        <small class="text-red-500">El nombre es requerido</small>
+      }
+    </div>
+
+    <!-- Description -->
+    <div class="flex flex-col gap-2">
+      <label for="description" class="font-medium">Descripción <span class="text-gray-400 text-sm">(opcional)</span></label>
+      <textarea
+        pTextarea
+        id="description"
+        [ngModel]="subjectModel().description"
+        (ngModelChange)="updateField('description', $event)"
+        placeholder="Describe los temas, objetivos y tecnologías que se verán en esta materia..."
+        [rows]="4"
+        [autoResize]="true"
+        class="w-full"
+      ></textarea>
+      <small class="text-gray-500">Esta descripción será visible para los estudiantes al consultar las materias disponibles.</small>
+    </div>
+
+    <!-- Credits -->
+    <div class="flex flex-col gap-2">
+      <label for="credits" class="font-medium">Créditos</label>
+      <p-inputNumber
+        id="credits"
+        [ngModel]="subjectModel().credits"
+        (ngModelChange)="updateField('credits', $event)"
+        [min]="1"
+        [max]="6"
+        [showButtons]="true"
+        placeholder="1-6"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Professor -->
+    <div class="flex flex-col gap-2">
+      <label for="professor" class="font-medium">Profesor Asignado</label>
+      <p-select
+        id="professor"
+        [options]="professors()"
+        [ngModel]="subjectModel().professorId"
+        (ngModelChange)="updateField('professorId', $event)"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Seleccione un profesor"
+        [filter]="true"
+        filterBy="name"
+        [showClear]="true"
+        class="w-full"
+      >
+        <ng-template pTemplate="selectedItem" let-selectedOption>
+          <div>{{ selectedOption.name }}</div>
+        </ng-template>
+        <ng-template pTemplate="item" let-professor>
+          <div class="flex flex-col">
+            <span>{{ professor.name }}</span>
+            <span class="text-sm text-gray-500">
+              Materias: {{ professor.activeSubjectsCount || 0 }} / {{ professor.maxAllowed || 3 }}
+              @if ((professor.activeSubjectsCount || 0) >= (professor.maxAllowed || 3)) {
+                <p-tag severity="danger" value="Completo" class="ml-2" />
+              }
+            </span>
+          </div>
+        </ng-template>
+      </p-select>
+      @if (isProfessorLimitReached()) {
+        <small class="text-orange-500">
+          Advertencia: Este profesor ha alcanzado su límite de materias
+        </small>
+      }
+    </div>
+
+    <!-- Is Active -->
+    <div class="flex items-center gap-2">
+      <p-checkbox
+        id="isActive"
+        [ngModel]="subjectModel().isActive"
+        (ngModelChange)="updateField('isActive', $event)"
+        [binary]="true"
+      />
+      <label for="isActive" class="cursor-pointer">Materia Activa</label>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        severity="secondary"
+        [text]="true"
+        (onClick)="handleCancel()"
+        [disabled]="loading()"
+      />
+      <p-button
+        label="Guardar"
+        icon="pi pi-check"
+        (onClick)="handleSubmit()"
+        [loading]="loading()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

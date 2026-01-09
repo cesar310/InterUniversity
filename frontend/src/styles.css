@@ -1,0 +1,77 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "tailwindcss";
+@import "primeicons/primeicons.css";
+
+/* Estilos globales para responsividad móvil */
+
+/* Asegurar que los inputs sean legibles en móviles */
+@media (max-width: 640px) {
+  /* Mejorar tamaño de texto en inputs para evitar zoom automático en iOS */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Asegurar que los botones sean fáciles de tocar (mínimo 44x44px) */
+  .p-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Mejorar espaciado en cards para móviles */
+  .p-card {
+    border-radius: 0.5rem;
+  }
+
+  .p-card-body {
+    padding: 1rem;
+  }
+
+  /* Mejorar tablas en scroll horizontal */
+  .p-datatable-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mejorar dialogs en móviles */
+  .p-dialog {
+    margin: 0.5rem;
+  }
+
+  .p-dialog-header {
+    padding: 1rem;
+  }
+
+  .p-dialog-content {
+    padding: 1rem;
+  }
+
+  /* Mejorar menús en móviles */
+  .p-menubar {
+    padding: 0.5rem;
+  }
+}
+
+/* Mejorar accesibilidad táctil en todos los tamaños */
+.p-button-icon-only {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+}
+
+/* Smooth scroll para toda la aplicación */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevenir zoom horizontal en dispositivos móviles */
+@media (max-width: 640px) {
+  body {
+    overflow-x: hidden;
+  }
+}
