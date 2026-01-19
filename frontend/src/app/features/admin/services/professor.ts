@@ -15,7 +15,7 @@ export class ProfessorService {
   readonly loading = signal<boolean>(false);
   readonly pagination = signal<{ page: number; pageSize: number; totalItems: number; totalPages: number } | null>(null);
 
-  getAll(page: number = 1, pageSize: number = 10, search?: string): Observable<PagedProfessorsResponse> {
+  getAll(page: number = 1, pageSize: number = 10, search?: string, sortField?: string, sortOrder?: number): Observable<PagedProfessorsResponse> {
     this.loading.set(true);
     let params = new HttpParams()
       .set('page', page.toString())
@@ -23,6 +23,11 @@ export class ProfessorService {
 
     if (search) {
       params = params.set('search', search);
+    }
+
+    if (sortField) {
+      params = params.set('sortField', sortField);
+      params = params.set('sortOrder', sortOrder === 1 ? 'asc' : 'desc');
     }
 
     return this.http.get<PagedProfessorsResponse>(this.apiUrl, { params }).pipe(

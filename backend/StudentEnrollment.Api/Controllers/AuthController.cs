@@ -80,15 +80,34 @@ public class AuthController(IMediator mediator) : ControllerBase
     /// </summary>
     [HttpPost("register")]
     [Authorize(Roles = "administrator")]
-    public async Task<ActionResult<ApiResponse<StudentDto>>> Register(
+    [ProducesResponseType(typeof(ApiResponse<RegisterStudentResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<ApiResponse<RegisterStudentResponse>>> Register(
         [FromBody] RegisterStudentCommand command,
         CancellationToken cancellationToken)
     {
         var result = await mediator.Send(command, cancellationToken);
+        
+        if (!result.IsSuccess)
+        {
+            var statusCode = result.ErrorCode switch
+            {
+                "EMAIL_ALREADY_EXISTS" => StatusCodes.Status409Conflict,
+                "ROLE_NOT_FOUND" => StatusCodes.Status400BadRequest,
+                _ => StatusCodes.Status400BadRequest
+            };
+            
+            return StatusCode(statusCode, ApiResponse<object>.ErrorResponse(
+                result.Error ?? "Error en el registro",
+                result.ErrorCode
+            ));
+        }
+        
         return CreatedAtAction(
             nameof(Register),
-            new { id = result.Value!.Id },
-            ApiResponse<StudentDto>.SuccessResponse(result.Value, "Estudiante registrado exitosamente")
+            new { id = result.Value!.StudentId },
+            ApiResponse<RegisterStudentResponse>.SuccessResponse(result.Value, "Estudiante registrado exitosamente")
         );
     }
 

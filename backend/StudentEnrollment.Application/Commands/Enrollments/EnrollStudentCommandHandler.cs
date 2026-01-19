@@ -19,6 +19,16 @@ public sealed class EnrollStudentCommandHandler(
         EnrollStudentCommand request,
         CancellationToken cancellationToken)
     {
+        // Verificar que las inscripciones estén abiertas
+        var enrollmentOpen = await systemConfigRepository.GetBoolValueAsync("enrollment_open", cancellationToken) ?? true;
+        if (!enrollmentOpen)
+        {
+            throw new BusinessRuleException(
+                "Las inscripciones están cerradas en este momento",
+                "ENROLLMENT_CLOSED"
+            );
+        }
+
         // Verificar que el estudiante existe
         var student = await studentRepository.GetByIdAsync(request.StudentId, cancellationToken)
             ?? throw new NotFoundException($"Estudiante con ID {request.StudentId} no encontrado", "STUDENT_NOT_FOUND");
@@ -50,18 +60,24 @@ public sealed class EnrollStudentCommandHandler(
             );
         }
 
-        // Validar que no tenga otra materia con el mismo profesor
-        var studentEnrollments = await enrollmentRepository.GetByStudentIdAsync(request.StudentId, cancellationToken);
-        var hasSameProfessor = studentEnrollments.Any(e => 
-            e.Status == EnrollmentStatus.Active && 
-            e.Subject.ProfessorId == subject.ProfessorId);
-
-        if (hasSameProfessor)
+        // Validar si se permite inscribir materias con el mismo profesor
+        var allowSameProfessor = await systemConfigRepository.GetBoolValueAsync("allow_same_professor", cancellationToken) ?? false;
+        
+        if (!allowSameProfessor)
         {
-            throw new BusinessRuleException(
-                $"El estudiante ya tiene una inscripción activa con el profesor {subject.Professor.Name}",
-                "DUPLICATE_PROFESSOR_ENROLLMENT"
-            );
+            // Solo validar si la configuración no permite el mismo profesor
+            var studentEnrollments = await enrollmentRepository.GetByStudentIdAsync(request.StudentId, cancellationToken);
+            var hasSameProfessor = studentEnrollments.Any(e => 
+                e.Status == EnrollmentStatus.Active && 
+                e.Subject.ProfessorId == subject.ProfessorId);
+
+            if (hasSameProfessor)
+            {
+                throw new BusinessRuleException(
+                    $"El sistema no permite inscribir múltiples materias con el mismo profesor ({subject.Professor.Name})",
+                    "DUPLICATE_PROFESSOR_ENROLLMENT"
+                );
+            }
         }
 
         // Crear la inscripción

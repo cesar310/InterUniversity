@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { MyEnrollment, EnrollRequest } from '../../../core/models/enrollment.model';
 import { AcademicOffer } from '../../../core/models/subject.model';
 import { Auth } from '../../../core/services/auth';
+import { SystemConfigService } from '../../../core/services/system-config';
 
 export interface MyEnrollmentsResponse {
   studentId: number;
@@ -31,6 +32,7 @@ export interface EnrollmentValidation {
 export class Enrollment {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(Auth);
+  private readonly configService = inject(SystemConfigService);
 
   readonly myEnrollmentsData = signal<MyEnrollmentsResponse | null>(null);
   readonly loading = signal<boolean>(false);
@@ -182,16 +184,21 @@ export class Enrollment {
       };
     }
 
-    // 4. Verificar que no tenga 2 materias del mismo profesor
-    const professorEnrollmentsCount = enrollmentsData.enrollments.filter(
-      e => e.professorName === subject.professor
-    ).length;
+    // 4. Verificar materias con el mismo profesor (según configuración del sistema)
+    const allowSameProfessor = this.configService.allowSameProfessor();
+    
+    if (!allowSameProfessor) {
+      // Si no se permite, verificar si ya tiene una materia con este profesor
+      const professorEnrollmentsCount = enrollmentsData.enrollments.filter(
+        e => e.professorName === subject.professor
+      ).length;
 
-    if (professorEnrollmentsCount >= 2) {
-      return {
-        canEnroll: false,
-        reason: `No puedes inscribir más de 2 materias con el profesor ${subject.professor}`
-      };
+      if (professorEnrollmentsCount >= 1) {
+        return {
+          canEnroll: false,
+          reason: `El sistema no permite inscribir múltiples materias con el mismo profesor (${subject.professor})`
+        };
+      }
     }
 
     // Todas las validaciones pasaron

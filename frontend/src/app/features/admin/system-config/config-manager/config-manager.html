@@ -16,11 +16,26 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th>Clave</th>
+        <th pSortableColumn="configKey">
+          <div class="flex items-center gap-2">
+            Clave
+            <p-sortIcon field="configKey" />
+          </div>
+        </th>
         <th>Valor</th>
-        <th>Tipo</th>
+        <th pSortableColumn="valueType">
+          <div class="flex items-center gap-2">
+            Tipo
+            <p-sortIcon field="valueType" />
+          </div>
+        </th>
         <th>Descripción</th>
-        <th>Última Actualización</th>
+        <th pSortableColumn="updatedAt">
+          <div class="flex items-center gap-2">
+            Última Actualización
+            <p-sortIcon field="updatedAt" />
+          </div>
+        </th>
         <th>Acciones</th>
       </tr>
     </ng-template>

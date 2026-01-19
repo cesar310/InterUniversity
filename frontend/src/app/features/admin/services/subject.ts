@@ -22,7 +22,7 @@ export class SubjectService {
   readonly loading = signal<boolean>(false);
   readonly pagination = signal<{ page: number; pageSize: number; totalItems: number; totalPages: number } | null>(null);
 
-  getAll(page: number = 1, pageSize: number = 10, search?: string, isActive?: boolean, professorId?: number): Observable<PagedSubjectsResponse> {
+  getAll(page: number = 1, pageSize: number = 10, search?: string, isActive?: boolean, professorId?: number, sortField?: string, sortOrder?: number): Observable<PagedSubjectsResponse> {
     this.loading.set(true);
     let params = new HttpParams()
       .set('page', page.toString())
@@ -31,6 +31,11 @@ export class SubjectService {
     if (search) params = params.set('search', search);
     if (isActive !== undefined) params = params.set('isActive', isActive.toString());
     if (professorId) params = params.set('professorId', professorId.toString());
+    
+    if (sortField) {
+      params = params.set('sortField', sortField);
+      params = params.set('sortOrder', sortOrder === 1 ? 'asc' : 'desc');
+    }
 
     return this.http.get<{ success: boolean; data: PagedSubjectsResponse; message: string | null }>(this.apiUrl, { params }).pipe(
       map(response => response.data),

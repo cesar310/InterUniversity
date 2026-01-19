@@ -30,6 +30,17 @@ public sealed record StudentDetailDto(
 );
 
 /// <summary>
+/// Response de registro de estudiante (incluye contraseña temporal)
+/// </summary>
+public sealed record RegisterStudentResponse(
+    int StudentId,
+    int UserId,
+    string StudentCode,
+    string Email,
+    string TemporaryPassword
+);
+
+/// <summary>
 /// Response paginado de estudiantes
 /// </summary>
 public sealed record PagedStudentsResponse(

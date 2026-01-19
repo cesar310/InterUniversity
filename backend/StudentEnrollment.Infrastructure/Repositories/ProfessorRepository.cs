@@ -60,15 +60,33 @@ public sealed class ProfessorRepository(ApplicationDbContext context) : IProfess
     public async Task<int> GetSubjectCountAsync(int professorId, CancellationToken cancellationToken = default)
         => await context.Subjects.CountAsync(s => s.ProfessorId == professorId, cancellationToken);
 
-    public async Task<IEnumerable<ProfessorWithWorkload>> GetProfessorsWithWorkloadAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProfessorWithWorkload>> GetProfessorsWithWorkloadAsync(int page, int pageSize, string? sortField = null, string? sortOrder = "asc", CancellationToken cancellationToken = default)
     {
         var connection = context.Database.GetDbConnection();
         await using var command = connection.CreateCommand();
         
-        command.CommandText = @"
+        // Mapeo de nombres de campos del frontend a la base de datos
+        var orderByClause = (sortField?.ToLower(), sortOrder?.ToLower()) switch
+        {
+            ("name", "desc") => "name DESC",
+            ("name", _) => "name ASC",
+            ("specialization", "desc") => "specialization DESC",
+            ("specialization", _) => "specialization ASC",
+            ("email", "desc") => "email DESC",
+            ("email", _) => "email ASC",
+            ("phone", "desc") => "phone DESC",
+            ("phone", _) => "phone ASC",
+            ("totalsubjects", "desc") => "total_subjects DESC",
+            ("totalsubjects", _) => "total_subjects ASC",
+            ("isactive", "desc") => "is_active DESC",
+            ("isactive", _) => "is_active ASC",
+            _ => "name ASC" // Default
+        };
+        
+        command.CommandText = $@"
             SELECT id, name, specialization, email, phone, is_active, total_subjects, max_allowed, status 
             FROM view_professors 
-            ORDER BY name 
+            ORDER BY {orderByClause} 
             LIMIT @pageSize OFFSET @offset";
         
         var pageParam = command.CreateParameter();

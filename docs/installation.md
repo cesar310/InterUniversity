@@ -1,77 +1,113 @@
-# Instalación y Configuración
+# Guía de Instalación y Despliegue
+
+Este documento detalla los pasos necesarios para configurar y ejecutar el entorno de desarrollo local del **Student Enrollment System**.
 
 ## Requisitos Previos
 
-Asegúrese de tener instaladas las siguientes herramientas en su entorno de desarrollo:
+Antes de comenzar, asegúrese de tener instaladas las siguientes herramientas en su sistema:
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- [Node.js](https://nodejs.org/) (v18.13.0 o superior)
-- [Angular CLI](https://angular.io/cli) v21
-- [MySQL Server](https://www.mysql.com/) 8.4.7
-- [Docker](https://www.docker.com/) (Opcional, para contenerización)
+1.  **Base de Datos:**
+    *   [MySQL Server](https://dev.mysql.com/downloads/mysql/) 8.4.7 o superior.
+    *   Cliente SQL (opcional): MySQL Workbench, DBeaver o similar.
 
-## Guía de Instalación
+2.  **Backend:**
+    *   [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 
-### 1. Base de Datos (MySQL 8.4.7)
+3.  **Frontend:**
+    *   [Node.js](https://nodejs.org/) (Versión LTS, recomendada v18.13.0+).
+    *   [Angular CLI](https://angular.io/cli) v21 (Instalar globalmente vía `npm install -g @angular/cli`).
 
-**Paso 1:** Iniciar el servicio de MySQL.
+4.  **Control de Versiones:**
+    *   [Git](https://git-scm.com/).
 
-**Paso 2:** Ejecutar el script de inicialización para crear la base de datos y tablas.
+---
 
+## Procedimiento de Instalación
+
+### 1. Configuración de la Base de Datos
+
+El sistema requiere una base de datos MySQL. Se proporciona un script SQL para la creación del esquema y la carga de datos iniciales.
+
+1.  Asegúrese de que el servicio de MySQL esté en ejecución.
+2.  Acceda a su cliente de MySQL o terminal.
+3.  Ejecute el script ubicado en `database/script.sql`.
+
+**Comando desde terminal:**
 ```bash
-# Desde la línea de comandos
-mysql -u root -p < ../database/script.sql
+mysql -u root -p < database/script.sql
 ```
 
-### 2. Backend (.NET 10)
+> **Nota:** Este script creará la base de datos `student_enrollment_system` (o `student_enrollment_db` según configuración), definirá las tablas, vistas, procedimientos almacenados e insertará datos iniciales (roles, usuarios administradores, configuraciones).
 
-**Paso 1:** Configurar información sensible.
+### 2. Configuración del Backend (.NET API)
 
-**Importante:** Este proyecto no incluye credenciales en el repositorio. Debe crear un archivo `appsettings.Local.json` en `backend/StudentEnrollment.Api/`.
+La API requiere configurar la cadena de conexión y otras credenciales sensibles.
 
-Cree el archivo basándose en el siguiente ejemplo:
+1.  Navegue al directorio del proyecto de la API:
+    ```bash
+    cd backend/StudentEnrollment.Api
+    ```
 
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Port=3306;Database=student_enrollment_db;User=root;Password=SU_PASSWORD;"
-  },
-  "JwtSettings": {
-    "Secret": "SU_CLAVE_SECRETA_MUY_SEGURA_MINIMO_32_CHARS"
-  },
-  "SmtpSettings": {
-    "Host": "smtp.gmail.com",
-    "Port": "587",
-    "Username": "su_email@gmail.com",
-    "Password": "su_app_password",
-    "SenderEmail": "no-reply@university.com"
-  }
-}
-```
+2.  Cree un archivo de configuración local llamado `appsettings.Local.json` para sobrescribir las configuraciones por defecto sin afectar el repositorio.
 
-**Paso 2:** Restaurar y ejecutar la API.
+    **Contenido de `appsettings.Local.json`:**
+    ```json
+    {
+      "ConnectionStrings": {
+        "DefaultConnection": "Server=localhost;Port=3306;Database=student_enrollment_system;User=root;Password=SU_PASSWORD_MYSQL;"
+      },
+      "JwtSettings": {
+        "Secret": "ESTA_ES_UNA_CLAVE_SECRETA_MUY_SEGURA_PARA_DESARROLLO_LOCAL_MINIMO_32_CHARS",
+        "Issuer": "StudentEnrollmentApi",
+        "Audience": "StudentEnrollmentClient",
+        "ExpiryMinutes": 60
+      },
+      "SmtpSettings": {
+        "Host": "smtp.example.com",
+        "Port": 587,
+        "Username": "user@example.com",
+        "Password": "password",
+        "SenderEmail": "no-reply@university.edu"
+      }
+    }
+    ```
+    > **Importante:** Reemplace `SU_PASSWORD_MYSQL` con la contraseña de su usuario root de MySQL. Asegúrese de que el nombre de la base de datos coincida con el creado por el script.
 
-```bash
-cd backend
-dotnet restore
-dotnet run --project StudentEnrollment.Api
-```
-La API estará disponible en `https://localhost:5001`.
+3.  Restaure las dependencias y ejecute la aplicación:
+    ```bash
+    dotnet restore
+    dotnet run
+    ```
 
-### 3. Frontend (Angular 21)
+4.  Verifique que la API esté funcionando accediendo a la documentación Swagger:
+    *   URL: `https://localhost:5001/swagger` (o el puerto indicado en la consola).
 
-**Paso 1:** Instalar dependencias.
+### 3. Configuración del Frontend (Angular)
 
-```bash
-cd frontend
-npm install
-```
+1.  Navegue al directorio del frontend:
+    ```bash
+    cd frontend
+    ```
 
-**Paso 2:** Verificar la configuración de entorno (`src/environments/environment.ts`) para asegurar que apunte a la URL correcta del backend.
+2.  Instale las dependencias del proyecto:
+    ```bash
+    npm install
+    ```
 
-**Paso 3:** Iniciar el servidor de desarrollo.
+3.  (Opcional) Verifique la configuración de entorno en `src/environments/environment.ts` si necesita apuntar a un puerto de backend diferente.
 
-```bash
-ng serve
-```
-La aplicación estará disponible en `http://localhost:4200`.
+4.  Inicie el servidor de desarrollo:
+    ```bash
+    ng serve
+    ```
+
+5.  Acceda a la aplicación web:
+    *   URL: `http://localhost:4200`
+
+---
+
+## Solución de Problemas Comunes
+
+*   **Error de conexión a base de datos:** Verifique que el servicio MySQL esté corriendo y que las credenciales en `appsettings.Local.json` sean correctas. Asegúrese de que el usuario tenga permisos sobre la base de datos.
+*   **Error de CORS:** Si el frontend no puede comunicarse con el backend, verifique que la configuración de CORS en `Program.cs` del backend permita el origen `http://localhost:4200`.
+*   **Versiones de Node/Angular:** Si encuentra errores de compatibilidad, asegúrese de usar las versiones especificadas en los requisitos previos.

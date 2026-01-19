@@ -1,6 +1,7 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, DestroyRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, interval } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../environments/environment';
 import { SystemConfig as SystemConfigModel } from '../models/system-config.model';
 
@@ -13,8 +14,12 @@ import { SystemConfig as SystemConfigModel } from '../models/system-config.model
 })
 export class SystemConfigService {
   private http = inject(HttpClient);
+  private destroyRef = inject(DestroyRef);
   private readonly apiUrl = `${environment.apiUrl}/config`;
-
+  
+  // Intervalo de recarga en milisegundos (30 segundos)
+  private readonly RELOAD_INTERVAL = 30000;
+  
   // Signal que almacena todas las configuraciones
   private configsSignal = signal<SystemConfigModel[]>([]);
   
@@ -23,6 +28,11 @@ export class SystemConfigService {
   
   // Signal que indica si hay un error al cargar las configuraciones
   private errorSignal = signal<string | null>(null);
+
+  constructor() {
+    // Iniciar polling automático cuando el servicio se crea
+    this.startAutoReload();
+  }
 
   // Computed signals para acceder a configuraciones específicas (numéricos)
   readonly maxSubjectsPerStudent = computed(() => {
@@ -81,7 +91,17 @@ export class SystemConfigService {
       const response = await firstValueFrom(
         this.http.get<{ success: boolean; data: SystemConfigModel[]; message: string | null }>(this.apiUrl)
       );
-      this.configsSignal.set(response.data || []);
+      
+      // Guardar configuraciones previas para detectar cambios
+      const previousConfigs = this.configsSignal();
+      const newConfigs = response.data || [];
+      
+      // Detectar cambios en configuraciones críticas
+      if (previousConfigs.length > 0) {
+        this.detectCriticalChanges(previousConfigs, newConfigs);
+      }
+      
+      this.configsSignal.set(newConfigs);
       this.loadedSignal.set(true);
     } catch (error: any) {
       console.error('Error al cargar configuraciones del sistema:', error);
@@ -90,6 +110,22 @@ export class SystemConfigService {
       this.configsSignal.set([]);
       this.loadedSignal.set(true);
     }
+  }
+
+  /**
+   * Detecta cambios en configuraciones críticas
+   */
+  private detectCriticalChanges(previous: SystemConfigModel[], current: SystemConfigModel[]): void {
+    const criticalKeys = ['allow_same_professor', 'enrollment_open', 'max_subjects_per_student'];
+    
+    criticalKeys.forEach(key => {
+      const prevConfig = previous.find(c => c.configKey === key);
+      const currConfig = current.find(c => c.configKey === key);
+      
+      if (prevConfig && currConfig && prevConfig.configValue !== currConfig.configValue) {
+        console.log(`Configuración actualizada: ${key} cambió de "${prevConfig.configValue}" a "${currConfig.configValue}"`);
+      }
+    });
   }
 
   /**
@@ -144,5 +180,21 @@ export class SystemConfigService {
   async reloadConfigurations(): Promise<void> {
     this.loadedSignal.set(false);
     await this.loadConfigurations();
+  }
+
+  /**
+   * Inicia la recarga automática de configuraciones
+   */
+  private startAutoReload(): void {
+    interval(this.RELOAD_INTERVAL)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        // Solo recargar si ya se han cargado las configuraciones al menos una vez
+        if (this.loadedSignal()) {
+          this.loadConfigurations().catch(error => {
+            console.error('Error en recarga automática de configuraciones:', error);
+          });
+        }
+      });
   }
 }

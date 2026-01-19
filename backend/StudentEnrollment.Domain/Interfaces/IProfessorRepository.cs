@@ -18,7 +18,7 @@ public interface IProfessorRepository
     /// <summary>
     /// Obtiene profesores desde la vista view_professors con contadores de materias
     /// </summary>
-    Task<IEnumerable<ProfessorWithWorkload>> GetProfessorsWithWorkloadAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProfessorWithWorkload>> GetProfessorsWithWorkloadAsync(int page, int pageSize, string? sortField = null, string? sortOrder = "asc", CancellationToken cancellationToken = default);
 }
 
 /// <summary>

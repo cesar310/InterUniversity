@@ -106,6 +106,10 @@ export class ConfigAudit implements OnInit {
 
   getChangeColor(log: ConfigAuditModel): string {
     // Colorear cambios según tipo
+    if (!log.oldValue) {
+      return 'text-blue-600'; // Valor inicial
+    }
+    
     const oldNum = parseFloat(log.oldValue);
     const newNum = parseFloat(log.newValue);
     

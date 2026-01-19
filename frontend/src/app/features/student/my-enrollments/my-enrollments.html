@@ -34,10 +34,30 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Materia</th>
-          <th>Profesor</th>
-          <th>Créditos</th>
-          <th>Fecha de Inscripción</th>
+          <th pSortableColumn="subjectName">
+            <div class="flex items-center gap-2">
+              Materia
+              <p-sortIcon field="subjectName" />
+            </div>
+          </th>
+          <th pSortableColumn="professorName">
+            <div class="flex items-center gap-2">
+              Profesor
+              <p-sortIcon field="professorName" />
+            </div>
+          </th>
+          <th pSortableColumn="credits">
+            <div class="flex items-center gap-2">
+              Créditos
+              <p-sortIcon field="credits" />
+            </div>
+          </th>
+          <th pSortableColumn="enrolledAt">
+            <div class="flex items-center gap-2">
+              Fecha de Inscripción
+              <p-sortIcon field="enrolledAt" />
+            </div>
+          </th>
           <th>Acciones</th>
         </tr>
       </ng-template>

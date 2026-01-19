@@ -33,13 +33,43 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th>Nombre</th>
-        <th>Especialización</th>
-        <th>Email</th>
-        <th>Teléfono</th>
-        <th>Materias Activas</th>
+        <th pSortableColumn="name">
+          <div class="flex items-center gap-2">
+            Nombre
+            <p-sortIcon field="name" />
+          </div>
+        </th>
+        <th pSortableColumn="specialization">
+          <div class="flex items-center gap-2">
+            Especialización
+            <p-sortIcon field="specialization" />
+          </div>
+        </th>
+        <th pSortableColumn="email">
+          <div class="flex items-center gap-2">
+            Email
+            <p-sortIcon field="email" />
+          </div>
+        </th>
+        <th pSortableColumn="phone">
+          <div class="flex items-center gap-2">
+            Teléfono
+            <p-sortIcon field="phone" />
+          </div>
+        </th>
+        <th pSortableColumn="totalSubjects">
+          <div class="flex items-center gap-2">
+            Materias Activas
+            <p-sortIcon field="totalSubjects" />
+          </div>
+        </th>
         <th>Disponibilidad</th>
-        <th>Estado</th>
+        <th pSortableColumn="isActive">
+          <div class="flex items-center gap-2">
+            Estado
+            <p-sortIcon field="isActive" />
+          </div>
+        </th>
         <th>Acciones</th>
       </tr>
     </ng-template>

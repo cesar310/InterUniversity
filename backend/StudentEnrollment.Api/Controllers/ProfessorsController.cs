@@ -20,9 +20,11 @@ public class ProfessorsController(IMediator mediator) : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
         [FromQuery] bool? isActive = true,
+        [FromQuery] string? sortField = null,
+        [FromQuery] string? sortOrder = "asc",
         CancellationToken cancellationToken = default)
     {
-        var query = new GetAllProfessorsQuery(page, pageSize, isActive);
+        var query = new GetAllProfessorsQuery(page, pageSize, isActive, sortField, sortOrder);
         var result = await mediator.Send(query, cancellationToken);
         return Ok(ApiResponse<PagedProfessorsResponse>.SuccessResponse(result));
     }

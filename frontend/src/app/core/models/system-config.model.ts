@@ -24,8 +24,8 @@ export interface UpdateConfigRequest {
 export interface ConfigAudit {
   id: number;
   configKey: string;
-  oldValue: string;
+  oldValue: string | null;
   newValue: string;
-  changedBy: string;
+  changedBy: string | null;
   changedAt: string;
 }

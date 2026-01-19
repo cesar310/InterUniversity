@@ -30,13 +30,48 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th>Nombre</th>
-        <th>Código</th>
-        <th>Email</th>
-        <th>Inscripciones</th>
-        <th>Máximo Permitido</th>
-        <th>Materias</th>
-        <th>Estado</th>
+        <th pSortableColumn="studentName">
+          <div class="flex items-center gap-2">
+            Nombre
+            <p-sortIcon field="studentName" />
+          </div>
+        </th>
+        <th pSortableColumn="studentCode">
+          <div class="flex items-center gap-2">
+            Código
+            <p-sortIcon field="studentCode" />
+          </div>
+        </th>
+        <th pSortableColumn="email">
+          <div class="flex items-center gap-2">
+            Email
+            <p-sortIcon field="email" />
+          </div>
+        </th>
+        <th pSortableColumn="enrolledSubjects">
+          <div class="flex items-center gap-2">
+            Inscripciones
+            <p-sortIcon field="enrolledSubjects" />
+          </div>
+        </th>
+        <th pSortableColumn="maxAllowed">
+          <div class="flex items-center gap-2">
+            Máximo Permitido
+            <p-sortIcon field="maxAllowed" />
+          </div>
+        </th>
+        <th pSortableColumn="subjects">
+          <div class="flex items-center gap-2">
+            Materias
+            <p-sortIcon field="subjects" />
+          </div>
+        </th>
+        <th pSortableColumn="isActive">
+          <div class="flex items-center gap-2">
+            Estado
+            <p-sortIcon field="isActive" />
+          </div>
+        </th>
         <th>Acciones</th>
       </tr>
     </ng-template>

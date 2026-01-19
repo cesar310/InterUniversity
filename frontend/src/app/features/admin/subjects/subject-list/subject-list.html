@@ -59,11 +59,36 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th>Nombre</th>
-        <th>Créditos</th>
-        <th>Profesor</th>
-        <th>Inscritos</th>
-        <th>Estado</th>
+        <th pSortableColumn="name">
+          <div class="flex items-center gap-2">
+            Nombre
+            <p-sortIcon field="name" />
+          </div>
+        </th>
+        <th pSortableColumn="credits">
+          <div class="flex items-center gap-2">
+            Créditos
+            <p-sortIcon field="credits" />
+          </div>
+        </th>
+        <th pSortableColumn="professorName">
+          <div class="flex items-center gap-2">
+            Profesor
+            <p-sortIcon field="professorName" />
+          </div>
+        </th>
+        <th pSortableColumn="enrolledStudents">
+          <div class="flex items-center gap-2">
+            Inscritos
+            <p-sortIcon field="enrolledStudents" />
+          </div>
+        </th>
+        <th pSortableColumn="isActive">
+          <div class="flex items-center gap-2">
+            Estado
+            <p-sortIcon field="isActive" />
+          </div>
+        </th>
         <th>Acciones</th>
       </tr>
     </ng-template>

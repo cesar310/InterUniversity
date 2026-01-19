@@ -19,14 +19,34 @@ public sealed class SubjectRepository(ApplicationDbContext context) : ISubjectRe
             .Include(s => s.Enrollments)
             .FirstOrDefaultAsync(s => s.Name == code, cancellationToken);
 
-    public async Task<IEnumerable<Subject>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default)
-        => await context.Subjects
+    public async Task<IEnumerable<Subject>> GetAllAsync(int page, int pageSize, string? sortField = null, string? sortOrder = "asc", CancellationToken cancellationToken = default)
+    {
+        var query = context.Subjects
             .Include(s => s.Professor)
             .Include(s => s.Enrollments)
-            .OrderBy(s => s.Name)
+            .AsQueryable();
+
+        // Aplicar ordenamiento dinámico
+        query = (sortField?.ToLower(), sortOrder?.ToLower()) switch
+        {
+            ("name", "desc") => query.OrderByDescending(s => s.Name),
+            ("name", _) => query.OrderBy(s => s.Name),
+            ("credits", "desc") => query.OrderByDescending(s => s.Credits),
+            ("credits", _) => query.OrderBy(s => s.Credits),
+            ("professorname", "desc") => query.OrderByDescending(s => s.Professor.Name),
+            ("professorname", _) => query.OrderBy(s => s.Professor.Name),
+            ("enrolledstudents", "desc") => query.OrderByDescending(s => s.Enrollments.Count(e => e.Status == Domain.Enums.EnrollmentStatus.Active)),
+            ("enrolledstudents", _) => query.OrderBy(s => s.Enrollments.Count(e => e.Status == Domain.Enums.EnrollmentStatus.Active)),
+            ("isactive", "desc") => query.OrderByDescending(s => s.IsActive),
+            ("isactive", _) => query.OrderBy(s => s.IsActive),
+            _ => query.OrderBy(s => s.Name) // Default
+        };
+
+        return await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+    }
 
     public async Task<IEnumerable<Subject>> GetActiveSubjectsAsync(CancellationToken cancellationToken = default)
         => await context.Subjects

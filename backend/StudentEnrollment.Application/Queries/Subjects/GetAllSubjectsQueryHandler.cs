@@ -15,6 +15,8 @@ public sealed class GetAllSubjectsQueryHandler(
         var subjects = await subjectRepository.GetAllAsync(
             request.Page,
             request.PageSize,
+            request.SortField,
+            request.SortOrder,
             cancellationToken
         );
 

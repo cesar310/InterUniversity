@@ -12,16 +12,16 @@ public sealed class RegisterStudentCommandHandler(
     IRoleRepository roleRepository,
     IPasswordHasher passwordHasher,
     IEmailService emailService
-) : IRequestHandler<RegisterStudentCommand, Result<StudentDto>>
+) : IRequestHandler<RegisterStudentCommand, Result<RegisterStudentResponse>>
 {
-    public async Task<Result<StudentDto>> Handle(
+    public async Task<Result<RegisterStudentResponse>> Handle(
         RegisterStudentCommand request,
         CancellationToken cancellationToken)
     {
         // 1. Validar que el email no exista
         if (await userRepository.EmailExistsAsync(request.Email, cancellationToken))
         {
-            return Result<StudentDto>.Failure(
+            return Result<RegisterStudentResponse>.Failure(
                 "El email ya está registrado",
                 "EMAIL_ALREADY_EXISTS"
             );
@@ -35,7 +35,7 @@ public sealed class RegisterStudentCommandHandler(
         var studentRole = await roleRepository.GetByNameAsync("student", cancellationToken);
         if (studentRole is null)
         {
-            return Result<StudentDto>.Failure(
+            return Result<RegisterStudentResponse>.Failure(
                 "Error de configuración: rol de estudiante no encontrado",
                 "ROLE_NOT_FOUND"
             );
@@ -79,18 +79,15 @@ public sealed class RegisterStudentCommandHandler(
             cancellationToken
         );
 
-        // 9. Retornar DTO
-        var studentDto = new StudentDto(
-            Id: student.Id,
-            StudentCode: student.StudentCode,
+        // 9. Retornar DTO con contraseña temporal
+        var response = new RegisterStudentResponse(
+            StudentId: student.Id,
             UserId: user.Id,
-            Name: student.Name,
+            StudentCode: student.StudentCode,
             Email: user.Email,
-            IsActive: user.IsActive,
-            CreatedAt: student.CreatedAt,
-            UpdatedAt: user.UpdatedAt
+            TemporaryPassword: temporaryPassword
         );
 
-        return Result<StudentDto>.Success(studentDto);
+        return Result<RegisterStudentResponse>.Success(response);
     }
 }

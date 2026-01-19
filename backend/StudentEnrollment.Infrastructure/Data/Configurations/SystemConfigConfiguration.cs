@@ -89,10 +89,10 @@ public sealed class SystemConfigConfiguration : IEntityTypeConfiguration<SystemC
             new SystemConfig
             {
                 Id = 3,
-                ConfigKey = "default_credits",
+                ConfigKey = "default_subject_credits",
                 ConfigValue = "3",
                 ValueType = ConfigValueType.Int,
-                Description = "Créditos por defecto para nuevas materias",
+                Description = "Créditos predeterminados por materia",
                 IsEditable = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -100,10 +100,54 @@ public sealed class SystemConfigConfiguration : IEntityTypeConfiguration<SystemC
             new SystemConfig
             {
                 Id = 4,
-                ConfigKey = "system_mode",
-                ConfigValue = "production",
+                ConfigKey = "min_subjects_per_student",
+                ConfigValue = "1",
+                ValueType = ConfigValueType.Int,
+                Description = "Mínimo de materias que un estudiante debe inscribir",
+                IsEditable = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new SystemConfig
+            {
+                Id = 5,
+                ConfigKey = "allow_same_professor",
+                ConfigValue = "false",
+                ValueType = ConfigValueType.Boolean,
+                Description = "Permitir que un estudiante tome múltiples materias del mismo profesor",
+                IsEditable = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new SystemConfig
+            {
+                Id = 6,
+                ConfigKey = "system_name",
+                ConfigValue = "Sistema de Inscripción Estudiantil",
                 ValueType = ConfigValueType.String,
-                Description = "Modo del sistema (production/maintenance)",
+                Description = "Nombre del sistema",
+                IsEditable = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new SystemConfig
+            {
+                Id = 7,
+                ConfigKey = "academic_period",
+                ConfigValue = "2026-1",
+                ValueType = ConfigValueType.String,
+                Description = "Período académico actual",
+                IsEditable = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new SystemConfig
+            {
+                Id = 8,
+                ConfigKey = "enrollment_open",
+                ConfigValue = "true",
+                ValueType = ConfigValueType.Boolean,
+                Description = "Indica si las inscripciones están abiertas",
                 IsEditable = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow

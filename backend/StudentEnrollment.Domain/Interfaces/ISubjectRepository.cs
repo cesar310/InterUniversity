@@ -6,7 +6,7 @@ public interface ISubjectRepository
 {
     Task<Subject?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<Subject?> GetByCodeAsync(string code, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Subject>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Subject>> GetAllAsync(int page, int pageSize, string? sortField = null, string? sortOrder = "asc", CancellationToken cancellationToken = default);
     Task<IEnumerable<Subject>> GetActiveSubjectsAsync(CancellationToken cancellationToken = default);
     Task<int> CountAsync(CancellationToken cancellationToken = default);
     Task<Subject> CreateAsync(Subject subject, CancellationToken cancellationToken = default);

@@ -1,26 +1,33 @@
 # Student Enrollment System
 
-![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)
-![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
-![Status](https://img.shields.io/badge/Status-En%20Desarrollo-yellow?style=for-the-badge)
-
-Sistema integral de gestión de inscripciones universitarias diseñado con una arquitectura Full Stack moderna y escalable.
+Sistema integral de gestión de inscripciones universitarias diseñado con una arquitectura Full Stack moderna, escalable y mantenible. Este proyecto implementa las mejores prácticas de desarrollo de software, incluyendo Clean Architecture y el patrón CQRS.
 
 ---
 
-## Documentación
+## Documentación del Proyecto
 
-La documentación detallada del proyecto se encuentra en la carpeta `docs`. Por favor, consulte los siguientes enlaces para obtener información específica:
+La documentación técnica detallada se encuentra organizada en el directorio `docs/`. A continuación, se presentan los enlaces directos a las secciones correspondientes:
 
-### [Guía de Instalación](docs/installation.md)
-Instrucciones paso a paso para configurar la base de datos, el backend y el frontend en su entorno local.
+### [Guía de Instalación y Configuración](docs/installation.md)
+Instrucciones detalladas para el despliegue del entorno de desarrollo local, incluyendo la configuración de la base de datos, servicios de backend y aplicación frontend.
 
-### [Arquitectura y Tecnologías](docs/architecture.md)
-Detalles sobre Clean Architecture, CQRS, y el stack tecnológico completo (.NET 10, Angular 21, MySQL).
+### [Arquitectura y Stack Tecnológico](docs/architecture.md)
+Descripción exhaustiva de la arquitectura del sistema (Clean Architecture), patrones de diseño implementados (CQRS, Mediator, Repository) y tecnologías utilizadas (.NET 10, Angular 21, MySQL). Incluye referencias al modelo de datos.
 
-### [Características del Sistema](docs/features.md)
-Descripción de los módulos de la aplicación, incluyendo portales de administración y estudiantes, y sistema de autenticación.
+### [Especificación Funcional](docs/features.md)
+Desglose de los módulos funcionales del sistema, detallando las capacidades de los portales de administración y estudiantes, así como los mecanismos de seguridad y autenticación.
 
-### [Estructura del Proyecto](docs/structure.md)
-Mapa detallado de la organización de archivos y carpetas del repositorio.
+### [Estructura del Repositorio](docs/structure.md)
+Mapa de la organización de archivos y directorios del proyecto, facilitando la navegación y comprensión de la estructura del código fuente.
+
+### Guías Técnicas Especializadas
+Documentación profunda para el desarrollo y mantenimiento de componentes específicos:
+*   **[Guía de Desarrollo Backend](docs/backend.md):** Detalles de implementación CQRS, validaciones y creación de nuevos endpoints.
+*   **[Guía de Desarrollo Frontend](docs/frontend.md):** Arquitectura Angular, gestión de estado y componentes UI.
+*   **[Referencia de Base de Datos](docs/database.md):** Diccionario de tablas, triggers y procedimientos almacenados.
+
+---
+
+## Estado del Proyecto
+
+El sistema se encuentra en fase de desarrollo activo. Se están implementando nuevas funcionalidades y optimizaciones de manera continua.

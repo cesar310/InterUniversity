@@ -10,4 +10,4 @@ namespace StudentEnrollment.Application.Commands.Auth;
 public sealed record RegisterStudentCommand(
     string Email,
     string Name
-) : IRequest<Result<StudentDto>>;
+) : IRequest<Result<RegisterStudentResponse>>;

@@ -6,5 +6,7 @@ namespace StudentEnrollment.Application.Queries.Professors;
 public sealed record GetAllProfessorsQuery(
     int Page = 1,
     int PageSize = 10,
-    bool? IsActive = true
+    bool? IsActive = true,
+    string? SortField = null,
+    string? SortOrder = "asc"
 ) : IRequest<PagedProfessorsResponse>;

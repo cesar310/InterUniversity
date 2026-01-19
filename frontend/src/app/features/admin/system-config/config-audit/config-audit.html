@@ -61,11 +61,26 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Fecha y Hora</th>
-          <th>Clave de Configuración</th>
+          <th pSortableColumn="changedAt">
+            <div class="flex items-center gap-2">
+              Fecha y Hora
+              <p-sortIcon field="changedAt" />
+            </div>
+          </th>
+          <th pSortableColumn="configKey">
+            <div class="flex items-center gap-2">
+              Clave de Configuración
+              <p-sortIcon field="configKey" />
+            </div>
+          </th>
           <th>Valor Anterior</th>
           <th>Valor Nuevo</th>
-          <th>Modificado Por</th>
+          <th pSortableColumn="changedBy">
+            <div class="flex items-center gap-2">
+              Modificado Por
+              <p-sortIcon field="changedBy" />
+            </div>
+          </th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-log>
@@ -77,7 +92,7 @@
             <p-tag [value]="log.configKey" severity="secondary" />
           </td>
           <td>
-            <span class="font-mono text-gray-600">{{ log.oldValue }}</span>
+            <span class="font-mono text-gray-600">{{ log.oldValue || '(sin valor anterior)' }}</span>
           </td>
           <td>
             <span class="font-mono font-semibold" [ngClass]="getChangeColor(log)">
@@ -87,7 +102,7 @@
           <td>
             <div class="flex items-center gap-2">
               <i class="pi pi-user text-gray-500"></i>
-              <span class="text-sm">{{ log.changedBy }}</span>
+              <span class="text-sm">{{ log.changedBy || 'Sistema' }}</span>
             </div>
           </td>
         </tr>
@@ -125,13 +140,13 @@
                 </div>
                 <div class="flex items-center gap-2 text-sm">
                   <i class="pi pi-user text-gray-500"></i>
-                  <span class="text-gray-600">{{ log.changedBy }}</span>
+                  <span class="text-gray-600">{{ log.changedBy || 'Sistema' }}</span>
                 </div>
                 <div class="mt-3 p-3 bg-gray-50 rounded-lg">
                   <div class="flex items-center justify-between">
                     <div class="text-center flex-1">
                       <div class="text-xs text-gray-500 mb-1">Anterior</div>
-                      <div class="font-mono text-sm text-gray-700">{{ log.oldValue }}</div>
+                      <div class="font-mono text-sm text-gray-700">{{ log.oldValue || '(sin valor)' }}</div>
                     </div>
                     <div class="px-3">
                       <i class="pi pi-arrow-right text-gray-400"></i>

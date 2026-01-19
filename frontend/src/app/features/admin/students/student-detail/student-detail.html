@@ -3,6 +3,8 @@
   [buttons]="headerButtons"
 />
 
+<p-confirmDialog />
+
 @if (student(); as student) {
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Información General -->
@@ -26,8 +28,8 @@
         <div>
           <label class="block text-sm font-medium text-gray-700">Estado</label>
           <p-tag
-            [severity]="getStatusSeverity(student.isActive)"
-            [value]="getStatusLabel(student.isActive)"
+            [severity]="getActiveStatusSeverity(student.isActive)"
+            [value]="getActiveStatusLabel(student.isActive)"
           />
         </div>
 
@@ -38,24 +40,127 @@
       </div>
     </p-card>
 
-    <!-- Inscripciones -->
+    <!-- Resumen de Inscripciones -->
+    <p-card header="Resumen de Inscripciones">
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <div class="text-3xl font-bold text-blue-600">
+              {{ activeEnrollmentsCount() }}
+            </div>
+            <div class="text-sm text-gray-600">Activas</div>
+          </div>
+          <div class="text-center p-4 bg-gray-50 rounded-lg">
+            <div class="text-3xl font-bold text-gray-600">
+              {{ totalEnrollmentsCount() }}
+            </div>
+            <div class="text-sm text-gray-600">Total</div>
+          </div>
+        </div>
+        <div class="text-center p-4 bg-green-50 rounded-lg">
+          <div class="text-3xl font-bold text-green-600">
+            {{ activeEnrollmentsCount() }}
+          </div>
+          <div class="text-sm text-gray-600">Créditos Inscritos</div>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Inscripciones Detalladas -->
+  <div class="mt-6">
     <p-card header="Inscripciones">
-      <p class="text-gray-600">Funcionalidad pendiente - Se mostrará la lista de materias inscritas</p>
+      @if (enrollmentsLoading()) {
+        <div class="text-center py-8">
+          <i class="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
+          <p class="mt-4 text-gray-600">Cargando inscripciones...</p>
+        </div>
+      } @else if (enrollments().length > 0) {
+        <p-table
+          [value]="enrollments()"
+          [paginator]="true"
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} inscripciones"
+          responsiveLayout="scroll"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="subjectName">
+                <div class="flex items-center gap-2">
+                  Materia
+                  <p-sortIcon field="subjectName" />
+                </div>
+              </th>
+              <th pSortableColumn="professorName">
+                <div class="flex items-center gap-2">
+                  Profesor
+                  <p-sortIcon field="professorName" />
+                </div>
+              </th>
+              <th pSortableColumn="enrolledAt">
+                <div class="flex items-center gap-2">
+                  Fecha de Inscripción
+                  <p-sortIcon field="enrolledAt" />
+                </div>
+              </th>
+              <th>Acciones</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-enrollment>
+            <tr>
+              <td>{{ enrollment.subjectName }}</td>
+              <td>{{ enrollment.professorName }}</td>
+              <td>{{ enrollment.enrolledAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                @if (enrollment.status === 'Active') {
+                  <p-button
+                    icon="pi pi-times"
+                    severity="danger"
+                    [outlined]="true"
+                    [loading]="isCancelling(enrollment.studentId, enrollment.subjectId)"
+                    [disabled]="cancellingEnrollment() !== null"
+                    (onClick)="confirmCancelEnrollment(enrollment)"
+                    pTooltip="Cancelar inscripción"
+                    tooltipPosition="top"
+                  />
+                } @else {
+                  <span class="text-gray-400 text-sm">No disponible</span>
+                }
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4" class="text-center">
+                <div class="py-8">
+                  <i class="pi pi-inbox text-5xl text-gray-400 mb-3"></i>
+                  <p class="text-gray-500 text-lg">No hay inscripciones registradas</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      } @else {
+        <div class="text-center py-8">
+          <i class="pi pi-inbox text-5xl text-gray-400 mb-3"></i>
+          <p class="text-gray-500 text-lg">No hay inscripciones registradas</p>
+        </div>
+      }
     </p-card>
   </div>
 } @else if (loading()) {
   <p-card>
-    <p class="text-center">Cargando estudiante...</p>
+    <div class="text-center py-8">
+      <i class="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
+      <p class="mt-4 text-gray-600">Cargando estudiante...</p>
+    </div>
   </p-card>
 } @else {
   <p-card>
-    <p class="text-center text-red-500">Estudiante no encontrado</p>
+    <div class="text-center py-8">
+      <i class="pi pi-times-circle text-5xl text-red-400 mb-3"></i>
+      <p class="text-red-500 text-lg">Estudiante no encontrado</p>
+    </div>
   </p-card>
 }
-
-<app-student-form
-  [visible]="showEditDialog()"
-  [student]="student()"
-  (onClose)="onEditClose()"
-  (onSuccess)="onEditSuccess()"
-/>

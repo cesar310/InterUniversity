@@ -7,5 +7,7 @@ public sealed record GetAllSubjectsQuery(
     int Page = 1,
     int PageSize = 10,
     bool? IsActive = true,
-    int? ProfessorId = null
+    int? ProfessorId = null,
+    string? SortField = null,
+    string? SortOrder = "asc"
 ) : IRequest<PagedSubjectsResponse>;

@@ -73,11 +73,13 @@ export class ProfessorList implements OnInit {
   loadProfessors(event: TableLazyLoadEvent): void {
     const page = (event.first || 0) / (event.rows || 10) + 1;
     const pageSize = event.rows || 10;
-    this.professorService.getAll(page, pageSize, this.searchTerm()).subscribe();
+    const sortField = event.sortField as string | undefined;
+    const sortOrder = event.sortOrder ?? undefined;
+    this.professorService.getAll(page, pageSize, this.searchTerm(), sortField, sortOrder).subscribe();
   }
 
   onSearch(): void {
-    this.professorService.getAll(1, 10, this.searchTerm()).subscribe();
+    this.professorService.getAll(1, 10, this.searchTerm(), undefined, undefined).subscribe();
   }
 
   createProfessor(): void {

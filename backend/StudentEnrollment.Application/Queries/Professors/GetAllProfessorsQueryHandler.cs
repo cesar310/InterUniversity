@@ -16,6 +16,8 @@ public sealed class GetAllProfessorsQueryHandler(
         var professorsWithWorkload = await professorRepository.GetProfessorsWithWorkloadAsync(
             request.Page,
             request.PageSize,
+            request.SortField,
+            request.SortOrder,
             cancellationToken
         );
 

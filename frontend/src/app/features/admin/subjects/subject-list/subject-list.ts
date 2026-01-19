@@ -93,13 +93,17 @@ export class SubjectList implements OnInit {
   loadSubjects(event: TableLazyLoadEvent) {
     const page = (event.first || 0) / (event.rows || 10) + 1;
     const pageSize = event.rows || 10;
+    const sortField = event.sortField as string | undefined;
+    const sortOrder = event.sortOrder ?? undefined;
     
     this.subjectService.getAll(
       page, 
       pageSize, 
       this.search(), 
       this.selectedStatus(),
-      this.selectedProfessor()
+      this.selectedProfessor(),
+      sortField,
+      sortOrder
     ).subscribe();
   }
 
@@ -126,7 +130,9 @@ export class SubjectList implements OnInit {
       pageSize, 
       this.search(), 
       this.selectedStatus(), 
-      this.selectedProfessor()
+      this.selectedProfessor(),
+      undefined,
+      undefined
     ).subscribe();
   }
 
@@ -169,7 +175,9 @@ export class SubjectList implements OnInit {
               pageSize, 
               this.search(), 
               this.selectedStatus(),
-              this.selectedProfessor()
+              this.selectedProfessor(),
+              undefined,
+              undefined
             ).subscribe();
           },
           error: () => {
@@ -196,7 +204,9 @@ export class SubjectList implements OnInit {
       pageSize,
       this.search(),
       this.selectedStatus(),
-      this.selectedProfessor()
+      this.selectedProfessor(),
+      undefined,
+      undefined
     ).subscribe();
   }
 }
