@@ -1,10 +1,10 @@
 // Enum ConfigValueType del backend (C#)
-// 0 = Int, 1 = String, 2 = Boolean, 3 = Decimal
+// El backend serializa los enums como strings gracias a JsonStringEnumConverter
 export enum ConfigValueType {
-  Int = 0,
-  String = 1,
-  Boolean = 2,
-  Decimal = 3
+  Int = 'Int',
+  String = 'String',
+  Boolean = 'Boolean',
+  Decimal = 'Decimal'
 }
 
 export interface SystemConfig {

@@ -47,7 +47,7 @@
         <td>
           @if (isEditing(config.id)) {
             @switch (config.valueType) {
-              @case (0) {
+              @case ('Int') {
                 <p-inputnumber
                   [(ngModel)]="editingValue"
                   [showButtons]="true"
@@ -55,7 +55,7 @@
                   class="w-full"
                 />
               }
-              @case (3) {
+              @case ('Decimal') {
                 <p-inputnumber
                   [(ngModel)]="editingValue"
                   [showButtons]="true"
@@ -65,7 +65,7 @@
                   class="w-full"
                 />
               }
-              @case (2) {
+              @case ('Boolean') {
                 <div class="flex items-center gap-2">
                   <p-toggleSwitch
                     [(ngModel)]="editingBoolValue"

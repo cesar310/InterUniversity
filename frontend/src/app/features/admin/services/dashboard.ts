@@ -1,8 +1,14 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { DashboardStats } from '../../../core/models/dashboard.model';
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message: string | null;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +21,8 @@ export class Dashboard {
 
   getStats(): Observable<DashboardStats> {
     this.loading.set(true);
-    return this.http.get<DashboardStats>(`${environment.apiUrl}/dashboard/stats`).pipe(
+    return this.http.get<ApiResponse<DashboardStats>>(`${environment.apiUrl}/dashboard/stats`).pipe(
+      map(response => response.data),
       tap({
         next: (stats) => {
           this.stats.set(stats);

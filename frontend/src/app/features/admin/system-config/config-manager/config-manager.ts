@@ -160,24 +160,16 @@ export class ConfigManager implements OnInit {
         return 'success';
       case ConfigValueType.Boolean:
         return 'warn';
+      case ConfigValueType.String:
+        return 'secondary';
       default:
         return 'secondary';
     }
   }
 
   getTypeName(type: ConfigValueType): string {
-    switch (type) {
-      case ConfigValueType.Int:
-        return 'Int';
-      case ConfigValueType.String:
-        return 'String';
-      case ConfigValueType.Boolean:
-        return 'Boolean';
-      case ConfigValueType.Decimal:
-        return 'Decimal';
-      default:
-        return 'Unknown';
-    }
+    // El tipo ya viene como string del backend, solo retornarlo
+    return type || 'Unknown';
   }
 
   formatDate(dateString?: string): string {
